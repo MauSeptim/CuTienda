@@ -1,4 +1,4 @@
-package com.cutienda.controllers;
+package com.cutienda.apis;
 
 import com.cutienda.models.Producto;
 import com.cutienda.services.ProductoService;
@@ -11,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/cutienda")
-public class ApiProducto {
+public class ProductoApi {
     @Autowired
     ProductoService productoService;
 

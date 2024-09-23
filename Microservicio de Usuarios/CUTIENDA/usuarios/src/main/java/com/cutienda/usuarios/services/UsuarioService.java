@@ -58,7 +58,7 @@ public class UsuarioService {
         Files.copy(foto.getInputStream(), rutaCompleta);
 
         // Retorna la URL relativa para acceder a la imagen
-        return "/static/" + nombreArchivo;
+        return "/Perfiles/" + nombreArchivo;
     }
     public Usuario autenticar(String correoElectronico, String contraseña) {
         Usuario usuario = usuarioRepository.findByCorreoElectronico(correoElectronico);
@@ -68,5 +68,15 @@ public class UsuarioService {
         }
         return null; // Autenticación fallida
     }
+
+    public void eliminar(String id) {
+        // Verifica si el usuario existe antes de eliminar, si es necesario
+        if (usuarioRepository.existsById(id)) {
+            usuarioRepository.deleteById(id); // Elimina el usuario por ID
+        } else {
+            throw new RuntimeException("Usuario no encontrado");
+        }
+    }
+
 
 }

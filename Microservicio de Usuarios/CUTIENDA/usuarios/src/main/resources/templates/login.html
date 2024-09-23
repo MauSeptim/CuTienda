@@ -50,10 +50,13 @@
         margin-top: 5%;
     }
     .bottom-buttons .button {
-        width: 48%;
+        width: 30%;
         padding: 2.5%;
     }
   </style>
+
+  <!-- Incluye SweetAlert2 desde el CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
 <div class="container">
@@ -92,12 +95,18 @@
       <!-- Botón para enviar el formulario (inicio de sesión) -->
       <button type="submit" class="button">INICIO</button>
 
+
+      <button type="button" class="button" th:onclick="window.location.href='/cutienda/recovery';">RECUPERAR PASS</button>
+
+
       <!-- Botón para redirigir a la página de registro -->
       <button type="button" class="button" th:onclick="window.location.href='/cutienda/registro';">CREAR CUENTA</button>
     </div>
 
   </form>
 </div>
+
+<!-- Script para mostrar/ocultar contraseña -->
 <script>
   function togglePassword() {
       var passwordField = document.getElementById("password");
@@ -120,5 +129,23 @@
       }
   });
 </script>
+
+<!-- Script para mostrar notificación con SweetAlert2 -->
+<script th:inline="javascript">
+  // Verificar si hay un mensaje de error desde el backend
+  const errorMessage = /*[[${error}]]*/ '';
+
+  if (errorMessage) {
+      Swal.fire({
+          position: 'top-end',   // Posición en la parte superior derecha
+          icon: 'error',
+          title: 'Error de inicio de sesión',
+          text: errorMessage,
+          timer: 3000,           // Desaparece después de 3 segundos
+          showConfirmButton: false
+      });
+  }
+</script>
+
 </body>
 </html>

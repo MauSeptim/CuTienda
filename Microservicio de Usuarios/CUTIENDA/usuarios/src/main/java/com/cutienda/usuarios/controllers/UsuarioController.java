@@ -2,14 +2,15 @@ package com.cutienda.usuarios.controllers;
 
 import com.cutienda.usuarios.models.Usuario;
 import com.cutienda.usuarios.services.UsuarioService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 
 @Controller
 @RequestMapping("/cutienda")
@@ -25,7 +26,7 @@ public class UsuarioController {
     }
 
     @PostMapping("/registro")
-    public ResponseEntity<String> registrarUsuario(
+    public String registrarUsuario(
             @RequestParam("nombre") String nombre,
             @RequestParam("apellidos") String apellidos,
             @RequestParam("correoElectronico") String correoElectronico,
@@ -33,7 +34,8 @@ public class UsuarioController {
             @RequestParam("tipo") String tipo,
             @RequestParam("contraseña") String contraseña,
             @RequestParam("confirm-password") String confirmacionContraseña,
-            @RequestParam("foto") MultipartFile foto) {
+            @RequestParam("foto") MultipartFile foto,
+            RedirectAttributes redirectAttributes) {
 
         try {
             Usuario usuario = new Usuario();
@@ -46,11 +48,14 @@ public class UsuarioController {
             usuario.setConfirmacionContraseña(confirmacionContraseña);
 
             usuarioService.registrarUsuario(usuario, foto);
+            redirectAttributes.addFlashAttribute("mensaje", "Usuario registrado con éxito");
 
-            return new ResponseEntity<>("Usuario registrado con éxito", HttpStatus.CREATED);
+            return "redirect:/cutienda/registro"; // Redirige a la página de éxito
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            redirectAttributes.addFlashAttribute("error", "Error al registrar usuario: " + e.getMessage());
+            return "redirect:/cutienda/registro"; // Redirige de vuelta al formulario en caso de error
         }
+
     }
 
     @GetMapping("/registroExitoso")
@@ -63,41 +68,99 @@ public class UsuarioController {
         return "login";
     }
 
+    @GetMapping("/perfil")
+    public String mostrarPerfil(HttpSession session, Model model, RedirectAttributes redirectAttributes) {
+        // Recuperar el usuario desde la sesión
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+
+        if (usuario != null) {
+            // Pasar el usuario completo al modelo para mostrarlos en el perfil
+            model.addAttribute("usuario", usuario);
+            return "perfilUsuario";
+        } else {
+            // Agregar un mensaje de error y redirigir a la página de inicio de sesión si no hay usuario en la sesión
+            redirectAttributes.addFlashAttribute("error", "Debe iniciar sesión para acceder al perfil.");
+            return "redirect:/cutienda/login";
+        }
+    }
+
+
+
+
     @PostMapping("/login")
-    public ResponseEntity<String> iniciarSesion(
+    public String iniciarSesion(
             @RequestParam("correoElectronico") String correoElectronico,
             @RequestParam("contraseña") String contraseña,
             @RequestParam("selectedRole") String selectedRole,
-            RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes,
+            HttpSession session) {
 
         Usuario usuario = usuarioService.autenticar(correoElectronico, contraseña);
 
         if (usuario != null) {
             if (selectedRole.equals(usuario.getTipo())) {
-                // Determinar la redirección basada en el rol
+                // Guardar el usuario en la sesión
+                session.setAttribute("usuario", usuario);
+
+                // Redirigir basado en el rol del usuario
                 if ("admin".equals(usuario.getTipo())) {
-                    // Redirigir a la página de administrador
-                    return new ResponseEntity<>("Usuario inició sesión como Administrador", HttpStatus.OK);
+                    return "redirect:/cutienda/perfil"; // Redirige a la página de perfil para administradores
                 } else if ("client".equals(usuario.getTipo())) {
-                    // Redirigir a la página del cliente
-                    return new ResponseEntity<>("Usuario inició sesión como Cliente", HttpStatus.OK);
+                    return "redirect:/cutienda/perfil"; // Redirige a la página de perfil para clientes
                 }
             } else {
                 // Rol seleccionado no coincide con el rol del usuario
                 redirectAttributes.addFlashAttribute("error", "Rol seleccionado no coincide con el rol del usuario.");
-                return new ResponseEntity<>("Fallo en el inicio de sesión: rol incorrecto", HttpStatus.BAD_REQUEST);
+                return "redirect:/cutienda/login";
             }
         } else {
             // Autenticación fallida
             redirectAttributes.addFlashAttribute("error", "Correo o contraseña incorrectos.");
-            return new ResponseEntity<>("Fallo en el inicio de sesión: credenciales incorrectas", HttpStatus.BAD_REQUEST);
+            return "redirect:/cutienda/login";
         }
-        return null;
+        return "redirect:/cutienda/login";
     }
+
+    @PostMapping("/perfil/eliminar")
+    public String eliminarCuenta(HttpSession session, RedirectAttributes redirectAttributes) {
+        // Obtener el usuario desde la sesión
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+
+        if (usuario != null) {
+            // Lógica para eliminar la cuenta del usuario
+            usuarioService.eliminar(usuario.getId());
+
+            // Invalidar la sesión
+            session.invalidate();
+
+            // Agregar un mensaje de éxito y redirigir a la página de inicio
+            redirectAttributes.addFlashAttribute("message", "Cuenta eliminada con éxito.");
+            return "redirect:/cutienda/login";
+        } else {
+            // Redirigir a la página de inicio de sesión si no hay usuario en la sesión
+            redirectAttributes.addFlashAttribute("error", "Debes iniciar sesión para eliminar tu cuenta.");
+            return "redirect:/cutienda/login";
+        }
+    }
+
+    @GetMapping("/recovery")
+    public String recovery() {
+        return "recovery";
+    }
+
 
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleException(Exception e) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    public String handleException(Exception e, RedirectAttributes redirectAttributes, HttpServletRequest request) {
+        String requestUrl = request.getRequestURL().toString();
+
+        if (requestUrl.contains("cutienda/registro")) {
+            redirectAttributes.addFlashAttribute("error", "Ocurrió un error durante el registro: " + e.getMessage());
+            return "redirect:/cutienda/registro";
+        } else {
+            redirectAttributes.addFlashAttribute("error", "Error interno: " + e.getMessage());
+            return "redirect:/cutienda/login";
+        }
     }
+
 }

@@ -65,6 +65,8 @@
             margin: 0 auto;
         }
     </style>
+    <!-- Incluye SweetAlert2 desde el CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
 <form class="container" action="/cutienda/registro" method="POST" enctype="multipart/form-data">
@@ -126,5 +128,32 @@
         }
     });
 </script>
+<!-- Script para mostrar notificación con SweetAlert2 -->
+<!-- Script para mostrar notificación con SweetAlert2 -->
+<script th:inline="javascript">
+    let errorMessage = /*[[${error} ?: '']]*/ '';
+    let successMessage = /*[[${mensaje} ?: '']]*/ '';
+
+    if (errorMessage !== '') {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error de registro',
+            text: errorMessage,
+            timer: 3000,
+            showConfirmButton: false
+        });
+    }
+
+    if (successMessage !== '') {
+        Swal.fire({
+            icon: 'success',
+            title: 'Registro exitoso',
+            text: successMessage,
+            timer: 3000,
+            showConfirmButton: false
+        });
+    }
+</script>
+
 </body>
 </html>

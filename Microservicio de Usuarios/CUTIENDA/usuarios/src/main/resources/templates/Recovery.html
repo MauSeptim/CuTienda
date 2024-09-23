@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="csrf-token" content="${_csrf.token}">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recuperar Contraseña</title>
+  <style>
+    body {
+      color: white;
+      font-family: Arial, sans-serif;
+      background-color: #002160;
+      margin: 5%;
+      padding: 0;
+    }
+    .encabezado {
+      position: fixed;
+      top: 0;
+      width: 90%;
+      background-color: #002160;
+      padding: 40px 0;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+    .encabezado img {
+      width: 250px;
+      height: auto;
+    }
+    .container {
+      margin-top: 180px;
+      width: 90%;
+      background: #002160;
+      padding: 40px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+    .buttons {
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-evenly;
+    }
+    .buttons button, .buttons a {
+        width: 55% 30%;
+        padding: 2.5%;
+      border: 50px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      transition: background-color 0.30s, box-shadow 0.30s;
+      text-decoration: none;
+      color: white;
+    }
+    .buttons .reset {
+      background-color: #28a745;
+    }
+    .buttons .reset:hover {
+      background-color: #218838;
+    }
+    .buttons .home {
+      background-color: #6c757d;
+    }
+    .buttons .home:hover {
+      background-color: #5a6268;
+    }
+  </style>
+</head>
+<body>
+
+<div class="encabezado">
+  <img src="/Recursos/logo.png" alt="Logo">
+</div>
+
+<div class="container">
+  <h2>Recuperar Contraseña</h2>
+  <form id="recover-form">
+    <div class="form-group">
+      <label for="nombre">Nombre</label>
+      <input type="text" id="nombre" name="nombre" required>
+    </div>
+    <div class="form-group">
+      <label for="apellidos">Apellidos</label>
+      <input type="text" id="apellidos" name="apellidos" required>
+    </div>
+    <div class="form-group">
+      <label for="correo">Correo Electrónico</label>
+      <input type="email" id="correo" name="correo" required>
+    </div>
+    <div class="form-group">
+      <label for="telefono">Teléfono</label>
+      <input type="tel" id="telefono" name="telefono">
+    </div>
+    <div id="new-password-section" style="display: none;">
+      <div class="form-group">
+        <label for="new-password">Nueva Contraseña</label>
+        <input type="password" id="new-password" name="new-password" required>
+      </div>
+    </div>
+    <button type="button" id="check-user">Verificar Usuario</button>
+    <div class="buttons">
+      <button type="submit" class="reset">Cambiar Contraseña</button>
+      <a href="/cutienda/login" class="home">Inicio</a>
+    </div>
+  </form>
+</div>
+
+<script>
+  document.getElementById('check-user').addEventListener('click', function() {
+      const nombre = document.getElementById('nombre').value;
+      const apellidos = document.getElementById('apellidos').value;
+      const correo = document.getElementById('correo').value;
+      const telefono = document.getElementById('telefono').value;
+
+      // Lógica de verificación (simulada)
+      if (nombre && apellidos && correo) {
+          // Simular que se encontró el usuario
+          document.getElementById('new-password-section').style.display = 'block';
+      } else {
+          alert('Usuario no encontrado');
+      }
+  });
+</script>
+
+</body>
+</html>

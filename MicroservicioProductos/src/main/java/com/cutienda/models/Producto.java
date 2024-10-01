@@ -5,12 +5,13 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "productos")
 public class Producto {
-    public Producto(String nombre, String vendedor, String descripcion, String foto, double precio) {
-        this.nombre = nombre;
-        this.vendedor = vendedor;
+    public Producto(String contentType, String descripcion, byte[] foto, String nombre, double precio, String vendedor) {
+        this.contentType = contentType;
         this.descripcion = descripcion;
         this.foto = foto;
+        this.nombre = nombre;
         this.precio = precio;
+        this.vendedor = vendedor;
     }
 
     @Id
@@ -18,7 +19,8 @@ public class Producto {
     private String nombre;
     private String vendedor;
     private String descripcion;
-    private String foto;
+    private String contentType;
+    private byte[] foto;
     private double precio;
 
     public String getId() {
@@ -41,11 +43,11 @@ public class Producto {
         this.vendedor = vendedor;
     }
 
-    public String getFoto() {
+    public byte[] getFoto() {
         return foto;
     }
 
-    public void setFoto(String foto) {
+    public void setFoto(byte[] foto) {
         this.foto = foto;
     }
 
@@ -63,5 +65,13 @@ public class Producto {
 
     public void setPrecio(double precio) {
         this.precio = precio;
+    }
+
+    public String getContentType() {
+        return contentType;
+    }
+
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
     }
 }

@@ -69,4 +69,13 @@ public class ProductoServiceImpl implements ProductoService{
             guardar(prod);
         }
     }
+
+    @Override
+    public List<Producto> obtenerPorNombreCoincidente(String nombre) {
+        List<Producto> coincidentes = productoRepository.findByNombreContainingIgnoreCase(nombre);
+        if (coincidentes != null) {
+            return coincidentes;
+        }
+        return List.of();
+    }
 }

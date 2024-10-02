@@ -8,5 +8,4 @@ import java.util.List;
 
 @Repository
 public interface ProductoEtiquetaRepository extends MongoRepository<Producto, String> {
-    List<Producto> findByNombreContaining(String nombre);
 }

@@ -11,4 +11,5 @@ public interface ProductoService {
     public Producto conseguirPorId(String id);
     public List<Producto> conseguirTodos();
     public void actualizarPorId(String id, Producto producto);
+    public List<Producto> obtenerPorNombreCoincidente(String nombre);
 }

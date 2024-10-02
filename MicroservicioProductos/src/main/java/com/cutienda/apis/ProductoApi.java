@@ -15,6 +15,7 @@ import java.util.Base64;
 import java.util.List;
 
 @RestController
+@CrossOrigin(origins = "*")
 @RequestMapping("/cutienda")
 public class ProductoApi {
     @Autowired
@@ -24,7 +25,7 @@ public class ProductoApi {
     public String bienvenido() {
         return "<h1>Bienvenidos</h1><br/><p>a la api <strong>Productos</strong></p>";
     }
-    @GetMapping("/producto/{id}")
+    @GetMapping("/producto/{id}/id")
     public ResponseEntity<ProductoDTO> obtenerProducto(@PathVariable String id) {
         Producto producto = productoService.conseguirPorId(id);
         if (producto == null) {
@@ -48,7 +49,7 @@ public class ProductoApi {
     public List<ProductoDTO> todosLosProductos() {
         List<Producto> productos = productoService.conseguirTodos();
         return productos.stream().map(producto -> {
-            return new ProductoDTO(
+                    return new ProductoDTO(
                     producto.getId(),
                     producto.getNombre(),
                     producto.getVendedor(),
@@ -57,6 +58,22 @@ public class ProductoApi {
                     producto.getPrecio()
             );
         }).toList();
+    }
+
+    @GetMapping("/producto/{nombre}/nombre")
+    public List<ProductoDTO> obtenerPorNombre(@PathVariable String nombre) {
+        return productoService.obtenerPorNombreCoincidente(nombre).
+                stream().
+                map(p -> {
+                   return new ProductoDTO(
+                            p.getId(),
+                            p.getNombre(),
+                            p.getVendedor(),
+                            p.getDescripcion(),
+                           "http://localhost:8076/cutienda/producto/" + p.getId() + "/foto",  // URL para la imagen
+                            p.getPrecio()
+                    );
+                }).toList();
     }
 
     @PostMapping("/producto/guardar")

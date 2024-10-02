@@ -1,6 +1,7 @@
 * {
     padding: 0;
     margin: 0;
+    box-sizing: border-box;
 }
 
 html, body {
@@ -8,100 +9,12 @@ html, body {
     width: 100%;
     height: 100%;
     display: flex;
-    align-items: center;
-    justify-content: center;
+    flex-direction: column;
 }
 
-.cuadro-producto {
-    background-color: #4471C4;
-    border-radius: 40px;
-    width: 85%;
-    height: 70%;
-    padding: 20px;
-    display: flex;
-    justify-content: space-around;
-}
-
-.detalles {
-    display: flex;
-    flex-flow: column;
-    align-items: center;
-    justify-content: center;
-}
-
-.txt-info {
-    color: #F5F5F5;
-    font-size: 25px;
-    font-family: Arial, Geneva, Tahoma, sans-serif;
-}
-
-.txt-resp {
-    color: #FFC94A;
-    font-size: 25px;
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
-}
-
-th, td {
-    padding: 0 20px;
-    padding-bottom: 20px;
-}
-
-.caja-comentario {
-    display: flex;
-    flex-flow: column;
-    align-items: center;
-    padding: 20px;
-    height: 120px;
-    width: 100%;
-}
-
-.coment {
-    border-radius: 20px;
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
-    color: black;
-    padding: 8px;
-    width: 100%;
-    height: 80%;
-    font-size: 14px;
-    resize: none;
-    scrollbar-color: #888 transparent;
-}
-
-.nombre-vendedor {
-    background-color: #001F5F;
-    color: white;
-    padding: 6px;
-    text-align: center;
-    border-radius: 8px;
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
-    width: 100%;
-}
-
-
-.boton {
-    margin-top: 20px;
-    border-radius: 50px;
-    color: #FFC94A; 
-    background-color: #001F5F;
-    padding: 8px;
-    border: #FFC94A 2px solid;
-}
-
-textarea::placeholder {
-    text-align: center;
-}
-
-.imagen {
-    border-radius: 35px;
-}
-
-.perfil-container {
-    display: inline-block;
-    cursor: pointer;
-}
 
 .bar {
-    position: fixed;
+    position: relative;
     top: 0;
     left: 0;
     right: 0;
@@ -109,6 +22,7 @@ textarea::placeholder {
     display: flex;
     justify-content: end;
     height: 140px;
+    z-index: 1000;
 }
 
 .boton-azul {
@@ -131,60 +45,65 @@ textarea::placeholder {
 
 .botones-bar {
     display: flex;
-    flex-flow: row;
     align-items: start;
+    flex-flow: wrap;
     justify-content: space-around;
     width: 30%; 
     ;
     padding: 20px;
 }
 
+.cutienda-leon {
 
-.icono-cutienda {
-    background-color: #4471C4;
-    display: inline-block;
-    padding: 10px;
-}
-
-.icono-cutienda, img{
-    width: 80px;
-    height: auto;
+    width: 12vw;
+    height: 20vh;
+    /* max-height: 17vh; */
     border-radius: 100%;
-    display: block;
+    border: #4471C4 2vh solid;
+
 }
 
 .titulo {
-    /* font-size: 25; */
     font-family: Arial, Helvetica, sans-serif;
+    font-size: 2.1rem;
     color: #F5F5F5;
     font-weight: bolder;
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
+    text-align: center;
+    margin-top: 13px; /* Cambiar absolute por márgenes o padding */
 }
 
 .icono-container {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 1rem;
 }
 
 .buscar-container {
-    height: 20px;
-    width: 60%;
+    height: 8vh;
+    width: 60vw;
     display: flex;
+    justify-content: center;
     cursor: pointer;
-    padding: 10px 20px;
+    padding: 10px 30px;
+    margin-top: 10vh;
+    margin: 200px auto;
+    align-self: center;
     background-color: #F5F5F5;
     border-radius: 30px;
     align-items: center;
-    box-shadow: 0 19px 29px rgb(0, 0, 0, 0.3);
-    margin-bottom: 85px;
+    box-shadow: 0 30px 25px rgb(0, 0, 0, 0.3);
+    margin-bottom: 20px;
+    position: absolute;
 }
 
 .buscar-input {
     font-size: 18px;
     width: 100%;
+    position: relative;
 }
 
 .buscar-container input{
@@ -218,3 +137,10 @@ textarea::placeholder {
 }
 
 
+#productos {
+    width: 100%;
+    margin: 200px auto;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 20px;
+}

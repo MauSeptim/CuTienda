@@ -5,6 +5,7 @@ import com.cutienda.models.Producto;
 import com.cutienda.services.ProductoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,16 +25,10 @@ public class ProductoApi {
         return "<h1>Bienvenidos</h1><br/><p>a la api <strong>Productos</strong></p>";
     }
     @GetMapping("/producto/{id}")
-    public ResponseEntity<ProductoDTO> ObtenerProducto(@PathVariable String id) {
+    public ResponseEntity<ProductoDTO> obtenerProducto(@PathVariable String id) {
         Producto producto = productoService.conseguirPorId(id);
         if (producto == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-
-        // Convertir la imagen a Base64 para la respuesta
-        String base64Image = null;
-        if (producto.getFoto() != null) {
-            base64Image = Base64.getEncoder().encodeToString(producto.getFoto());
         }
 
         // Crear DTO para la respuesta
@@ -42,7 +37,7 @@ public class ProductoApi {
                 producto.getNombre(),
                 producto.getVendedor(),
                 producto.getDescripcion(),
-                base64Image,
+                "http://localhost:8076/cutienda/producto/" + producto.getId() + "/foto",  // URL para la imagen
                 producto.getPrecio()
         );
 
@@ -53,16 +48,12 @@ public class ProductoApi {
     public List<ProductoDTO> todosLosProductos() {
         List<Producto> productos = productoService.conseguirTodos();
         return productos.stream().map(producto -> {
-            String base64Image = null;
-            if (producto.getFoto() != null) {
-                base64Image = Base64.getEncoder().encodeToString(producto.getFoto());
-            }
             return new ProductoDTO(
                     producto.getId(),
                     producto.getNombre(),
                     producto.getVendedor(),
                     producto.getDescripcion(),
-                    base64Image,
+                    "http://localhost:8076/cutienda/producto/" + producto.getId() + "/foto",  // URL para la imagen
                     producto.getPrecio()
             );
         }).toList();
@@ -82,11 +73,32 @@ public class ProductoApi {
             String contentType = foto.getContentType(); // Obtener el tipo de contenido
 
             // Crear un nuevo producto y establecer la imagen
-            Producto producto = new Producto(contentType, descripcion, imagenBytes, nombre, precio, vendedor);
+            Producto producto =  Producto.builder().
+                    descripcion(descripcion).
+                    nombre(nombre).
+                    contentType(contentType).
+                    vendedor(vendedor).
+                    precio(precio).
+                    foto(imagenBytes).
+                    build();
+
             productoService.guardar(producto);
             return ResponseEntity.status(HttpStatus.CREATED).body(producto);
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+    @GetMapping(value = "/producto/{id}/foto", produces = MediaType.ALL_VALUE)
+    public ResponseEntity<byte[]> obtenerFoto(@PathVariable String id) {
+        Producto producto = productoService.conseguirPorId(id);
+        if (producto == null || producto.getFoto() == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        // Devuelve la imagen como respuesta
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(producto.getContentType())) // O el tipo adecuado según el archivo
+                .body(producto.getFoto());
+    }
+
 }

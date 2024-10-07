@@ -126,15 +126,15 @@
 <body>
 
 <div class="encabezado">
-  <img src="/Recursos/logo.png" alt="Logo">
+  <img src="https://drive.google.com/file/d/1rmVJi1j1xZacrSZvTizv2ctgsI6caE2E/view?usp=sharing" alt="Logo">
 </div>
 
 <div class="container">
   <div class="profile-section">
-    <img th:src="@{${usuario.fotoUrl}}" alt="Imagen de Perfil" class="profile-image">
-    <label for="profile-image">Cambiar Imagen</label>
-    <input type="file" id="profile-image" name="profile-image" accept="image/*">
-  </div>
+  <img th:src="@{${usuario.fotoUrl} != null ? 'data:image/png;base64,' + ${usuario.fotoUrl} : '/path/to/default/image.png'}" alt="Imagen de Perfil" class="profile-image">
+  <label for="profile-image">Cambiar Imagen</label>
+  <input type="file" id="profile-image" name="foto" accept="image/*"> <!-- Asegúrate que el nombre sea "foto" -->
+</div>
 
   <div class="form-section">
     <div class="tabs">

@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
+
 
 @Controller
 @RequestMapping("/cutienda")
@@ -47,16 +49,38 @@ public class UsuarioController {
             usuario.setContraseña(contraseña);
             usuario.setConfirmacionContraseña(confirmacionContraseña);
 
-            usuarioService.registrarUsuario(usuario, foto);
+            // Validar las contraseñas
+            if (!contraseña.equals(confirmacionContraseña)) {
+                throw new IllegalArgumentException("Las contraseñas no coinciden");
+            }
+
+            // Almacenar la foto directamente como bytes en el objeto Usuario
+            if (foto != null && !foto.isEmpty()) {
+                byte[] imagenBytes = foto.getBytes(); // Obtener los bytes de la foto
+                usuario.setFotoUrl(imagenBytes); // Establecer los bytes en el objeto Usuario
+            } else {
+                throw new IllegalArgumentException("La foto es obligatoria");
+            }
+
+            // Registrar el usuario en la base de datos
+            usuarioService.registrarUsuario(usuario); // Guardar el usuario en la base de datos
             redirectAttributes.addFlashAttribute("mensaje", "Usuario registrado con éxito");
 
             return "redirect:/cutienda/registro"; // Redirige a la página de éxito
+        } catch (IOException e) {
+            redirectAttributes.addFlashAttribute("error", "Error al cargar la foto: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Error al registrar usuario: " + e.getMessage());
-            return "redirect:/cutienda/registro"; // Redirige de vuelta al formulario en caso de error
         }
 
+        return "redirect:/cutienda/registro"; // Redirige de vuelta al formulario en caso de error
     }
+
+
+
+
 
     @GetMapping("/registroExitoso")
     public String registroExitoso() {
@@ -76,13 +100,14 @@ public class UsuarioController {
         if (usuario != null) {
             // Pasar el usuario completo al modelo para mostrarlos en el perfil
             model.addAttribute("usuario", usuario);
-            return "perfilUsuario";
+            return "perfilUsuario"; // Asegúrate de que esta vista exista
         } else {
             // Agregar un mensaje de error y redirigir a la página de inicio de sesión si no hay usuario en la sesión
             redirectAttributes.addFlashAttribute("error", "Debe iniciar sesión para acceder al perfil.");
             return "redirect:/cutienda/login";
         }
     }
+
 
 
 

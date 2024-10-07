@@ -2,6 +2,7 @@ package com.cutienda.usuarios.models;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import java.util.Base64;
 import org.springframework.web.multipart.MultipartFile;
 
 @Document(collection = "usuarios")
@@ -15,7 +16,7 @@ public class Usuario {
     private String telefono;
     private String tipo; // admin o client
     private String contraseña;
-    private String fotoUrl; // Para guardar la URL de la foto
+    private byte[] fotoUrl; // Para guardar la URL de la foto
     private String confirmacionContraseña;
 
     // Getters y Setters
@@ -76,10 +77,13 @@ public class Usuario {
     }
 
     public String getFotoUrl() {
-        return fotoUrl;
+        if (fotoUrl != null && fotoUrl.length > 0) {
+            return Base64.getEncoder().encodeToString(fotoUrl);
+        }
+        return null; // Manejar el caso cuando no hay foto
     }
 
-    public void setFotoUrl(String fotoUrl) {
+    public void setFotoUrl(byte[] fotoUrl) {
         this.fotoUrl = fotoUrl;
     }
 

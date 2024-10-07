@@ -1,0 +1,84 @@
+* {
+    padding: 0;
+    margin: 0;
+}
+
+.cuadro-producto {
+    background-color: #4471C4;
+    border-radius: 20px; /* Reducido para un borde más elegante */
+    width: 85%;
+    max-width: 400px; /* Ancho máximo para uniformidad */
+    margin: 4vh auto; /* Centrar el cuadro y agregar un margen */
+    display: flex;
+    flex-direction: column; /* Cambiado a columna para apilar elementos */
+    align-items: center; /* Centrar los elementos */
+    box-shadow: 30px 24px 20px rgb(0, 0, 0, 0.3);
+    padding: 20px;
+}
+
+.detalles {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%; /* Asegúrate de que ocupe todo el ancho */
+}
+
+.txt-info {
+    color: #F5F5F5;
+    font-size: 1rem; /* Ajustado para que sea más legible */
+    font-family: Arial, Geneva, Tahoma, sans-serif;
+    margin-bottom: 5px; /* Añadir espacio entre las líneas */
+}
+
+.txt-resp {
+    color: #FFC94A;
+    font-size: 1.2rem; /* Ajustado para ser un poco más pequeño */
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.caja-comentario {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    width: 100%;
+}
+
+.coment {
+    border-radius: 20px;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    color: black;
+    padding: 8px;
+    width: 90%; /* Asegúrate de que el tamaño sea adecuado */
+    max-height: 100px;
+    font-size: 14px;
+    resize: none;
+}
+
+.nombre-vendedor {
+    background-color: #001F5F;
+    color: white;
+    padding: 6px;
+    text-align: center;
+    border-radius: 8px;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    width: 100%;
+    margin: 10px 0; /* Espaciado alrededor */
+}
+
+.boton {
+    margin-top: 10px; /* Espaciado más pequeño */
+    border-radius: 50px;
+    color: #FFC94A; 
+    background-color: #001F5F;
+    padding: 8px 16px; /* Espaciado interno ajustado */
+    border: #FFC94A 2px solid;
+    width: 100%; /* Hacer que el botón ocupe todo el ancho */
+}
+
+.imagen {
+    border-radius: 20px; /* Reducido para un borde más elegante */
+    width: 100%;
+    height: auto; /* Mantener la proporción de la imagen */
+}

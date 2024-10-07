@@ -77,7 +77,7 @@ async function mostrarProductos() {
                     </table>
                     <div class="caja-comentario">
                         <span id="comentarios-txt-info" class="txt-info">Comentarios</span>
-                        <textarea name="coment" class="coment" placeholder="no hay comentarios sobre este vendedor"></textarea>
+                        <textarea readonly name="coment" class="coment" placeholder="no hay comentarios sobre este vendedor"></textarea>
                     </div>
                     <div class="nombre-vendedor">
                         <span>${producto.vendedor}</span>

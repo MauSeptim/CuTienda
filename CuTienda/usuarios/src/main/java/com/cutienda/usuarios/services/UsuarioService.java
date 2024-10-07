@@ -1,16 +1,12 @@
 package com.cutienda.usuarios.services;
 
-
+import com.cutienda.usuarios.models.Usuario;
+import com.cutienda.usuarios.repositories.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import com.cutienda.usuarios.models.Usuario;
-import com.cutienda.usuarios.repositories.UsuarioRepository;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 @Service
 public class UsuarioService {
@@ -18,25 +14,43 @@ public class UsuarioService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-    private final Path rootLocation = Paths.get("uploads");
+    public Usuario registrarUsuario(Usuario usuario) {
+        // Lógica adicional de validación
+        if (!usuario.getContraseña().equals(usuario.getConfirmacionContraseña())) {
+            throw new IllegalArgumentException("Las contraseñas no coinciden");
+        }
 
-    public Usuario registrarUsuario(Usuario usuario, MultipartFile foto) {
-        try {
-            if (!foto.isEmpty()) {
-                String filename = foto.getOriginalFilename();
-                Path destinationFile = this.rootLocation.resolve(
-                                Paths.get(filename))
-                        .normalize().toAbsolutePath();
-                Files.copy(foto.getInputStream(), destinationFile);
-                usuario.setFoto(destinationFile.toString());
-            }
-            return usuarioRepository.save(usuario);
-        } catch (IOException e) {
-            throw new RuntimeException("Error al guardar el archivo", e);
+        // Guarda el usuario en el repositorio
+        return usuarioRepository.save(usuario);
+    }
+
+
+
+
+    public Usuario autenticar(String correoElectronico, String contraseña) {
+        Usuario usuario = usuarioRepository.findByCorreoElectronico(correoElectronico);
+
+        if (usuario != null && usuario.getContraseña().equals(contraseña)) {
+            return usuario; // Autenticación exitosa
+        }
+        return null; // Autenticación fallida
+    }
+
+    public void eliminar(String id) {
+        // Verifica si el usuario existe antes de eliminar, si es necesario
+        if (usuarioRepository.existsById(id)) {
+            usuarioRepository.deleteById(id); // Elimina el usuario por ID
+        } else {
+            throw new RuntimeException("Usuario no encontrado");
         }
     }
 
-    public Usuario obtenerUsuarioPorCorreo(String correoElectronico) {
-        return usuarioRepository.findByCorreoElectronico(correoElectronico);
+    @org.jetbrains.annotations.NotNull
+    private byte[] almacenarFoto(MultipartFile foto) throws IOException {
+        // Convertir el archivo a bytes
+        return foto.getBytes();
     }
+
+
+
 }

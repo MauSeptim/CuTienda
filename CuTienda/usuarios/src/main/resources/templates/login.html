@@ -50,33 +50,64 @@
         margin-top: 5%;
     }
     .bottom-buttons .button {
-        width: 48%;
+        width: 30%;
         padding: 2.5%;
     }
   </style>
+
+  <!-- Incluye SweetAlert2 desde el CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
 <div class="container">
-  <img src="/logo.png" alt="Logo" class="logo">
+  <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAmUAAAD3CAYAAABcviNGAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqG0AAAACXBIWXMAAB7CAAAewgFu0HU+AAAACXZwQWcAAAAAAABIAAAABAAAAQAAABAAAAEAAABAAABIAAAAABhQAAAAEAAAAAAAD8AABkAA8gAAAABJRU5ErkJggg==" alt="logo" class="logo">
+
   <h1>CUT-TIENDA</h1>
-  <div class="radio-group">
+
+  <!-- Formulario de inicio de sesión -->
+  <form th:action="@{/cutienda/login}" method="post" id="loginForm">
+
+    <!-- Selección del rol (admin o client) -->
+    <div class="radio-group">
+      <label>
+        <input type="radio" name="role" value="admin" required> ADMINISTRADOR
+      </label>
+      <label>
+        <input type="radio" name="role" value="client" required> CLIENTE
+      </label>
+    </div>
+
+    <!-- Campo de correo electrónico -->
+    <input type="email" placeholder="Correo electrónico" name="correoElectronico" class="input-field" required>
+
+    <!-- Campo de contraseña -->
+    <input type="password" placeholder="Contraseña" name="contraseña" class="input-field" id="password" required>
+
+    <!-- Mostrar/Ocultar contraseña -->
     <label>
-      <input type="radio" name="role" value="admin"> ADMINISTRADOR
+      <input type="checkbox" onclick="togglePassword()"> Mostrar contraseña
     </label>
-    <label>
-      <input type="radio" name="role" value="client"> CLIENTE
-    </label>
-  </div>
-  <input type="email" placeholder="Correo electrónico" class="input-field">
-  <input type="password" placeholder="Contraseña" class="input-field" id="password">
-  <label>
-    <input type="radio" name="show-password" onclick="togglePassword()"> SHOW
-  </label>
-  <div class="bottom-buttons">
-    <button class="button">INICIO</button>
-    <button class="button">CREAR CUENTA</button>
-  </div>
+
+    <!-- Campo oculto para el rol seleccionado -->
+    <input type="hidden" id="selectedRole" name="selectedRole">
+
+    <!-- Botones -->
+    <div class="bottom-buttons">
+      <!-- Botón para enviar el formulario (inicio de sesión) -->
+      <button type="submit" class="button">INICIO</button>
+
+
+      <button type="button" class="button" th:onclick="window.location.href='/cutienda/recovery';">RECUPERAR PASS</button>
+
+
+      <!-- Botón para redirigir a la página de registro -->
+      <button type="button" class="button" th:onclick="window.location.href='/cutienda/registro';">CREAR CUENTA</button>
+    </div>
+
+  </form>
 </div>
+
+<!-- Script para mostrar/ocultar contraseña -->
 <script>
   function togglePassword() {
       var passwordField = document.getElementById("password");
@@ -86,6 +117,36 @@
           passwordField.type = "password";
       }
   }
+
+  // Script para almacenar el rol seleccionado en un campo oculto
+  document.getElementById("loginForm").addEventListener("submit", function(event) {
+      var selectedRole = document.querySelector('input[name="role"]:checked');
+      if (selectedRole) {
+          document.getElementById("selectedRole").value = selectedRole.value;
+      } else {
+          // Manejar el caso en el que no se selecciona ningún rol
+          alert("Por favor, seleccione un rol.");
+          event.preventDefault(); // Evita el envío del formulario
+      }
+  });
 </script>
+
+<!-- Script para mostrar notificación con SweetAlert2 -->
+<script th:inline="javascript">
+  // Verificar si hay un mensaje de error desde el backend
+  const errorMessage = /*[[${error}]]*/ '';
+
+  if (errorMessage) {
+      Swal.fire({
+          position: 'top-end',   // Posición en la parte superior derecha
+          icon: 'error',
+          title: 'Error de inicio de sesión',
+          text: errorMessage,
+          timer: 3000,           // Desaparece después de 3 segundos
+          showConfirmButton: false
+      });
+  }
+</script>
+
 </body>
 </html>

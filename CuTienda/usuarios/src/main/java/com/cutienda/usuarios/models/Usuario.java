@@ -2,59 +2,30 @@ package com.cutienda.usuarios.models;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import java.util.Base64;
+import org.springframework.web.multipart.MultipartFile;
 
-@Document(collection = "cutienda")
+@Document(collection = "usuarios")
 public class Usuario {
 
     @Id
     private String id;
-    private String tipo;
     private String nombre;
     private String apellidos;
     private String correoElectronico;
-    private String contraseña;
     private String telefono;
-    private String foto;
+    private String tipo; // admin o client
+    private String contraseña;
+    private byte[] fotoUrl; // Para guardar la URL de la foto
+    private String confirmacionContraseña;
+
     // Getters y Setters
-
-    public String getApellidos() {
-        return apellidos;
-    }
-    public void setApellidos(String apellidos) {
-        this.apellidos = apellidos;
+    public String getId() {
+        return id;
     }
 
-
-    public String getTipo() {
-        return tipo;
-    }
-    public void setTipo(String tipo) {
-        this.tipo = tipo;
-    }
-
-
-    public String getTelefono() {
-        return telefono;
-    }
-
-    public void setTelefono(String telefono) {
-        this.telefono = telefono;
-    }
-
-    public void setContraseña(String contraseña) {
-        this.contraseña = contraseña;
-    }
-
-    public String getContraseña() {
-        return contraseña;
-    }
-
-    public String getFoto() {
-        return foto;
-    }
-
-    public void setFoto(String Foto) {
-        this.foto = foto;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getNombre() {
@@ -65,11 +36,62 @@ public class Usuario {
         this.nombre = nombre;
     }
 
+    public String getApellidos() {
+        return apellidos;
+    }
+
+    public void setApellidos(String apellidos) {
+        this.apellidos = apellidos;
+    }
+
     public String getCorreoElectronico() {
         return correoElectronico;
     }
 
     public void setCorreoElectronico(String correoElectronico) {
         this.correoElectronico = correoElectronico;
+    }
+
+    public String getTelefono() {
+        return telefono;
+    }
+
+    public void setTelefono(String telefono) {
+        this.telefono = telefono;
+    }
+
+    public String getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
+    }
+
+    public String getContraseña() {
+        return contraseña;
+    }
+
+    public void setContraseña(String contraseña) {
+        this.contraseña = contraseña;
+    }
+
+    public String getFotoUrl() {
+        if (fotoUrl != null && fotoUrl.length > 0) {
+            return Base64.getEncoder().encodeToString(fotoUrl);
+        }
+        return null; // Manejar el caso cuando no hay foto
+    }
+
+    public void setFotoUrl(byte[] fotoUrl) {
+        this.fotoUrl = fotoUrl;
+    }
+
+    public String getConfirmacionContraseña() {
+        return confirmacionContraseña;
+    }
+
+    public void setConfirmacionContraseña(String confirmacionContraseña) {
+        this.confirmacionContraseña = confirmacionContraseña;
     }
 }

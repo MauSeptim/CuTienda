@@ -65,11 +65,13 @@
             margin: 0 auto;
         }
     </style>
+    <!-- Incluye SweetAlert2 desde el CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
-<form class="container" action="/cutienda/registro" method="POST">
+<form class="container" action="/cutienda/registro" method="POST" enctype="multipart/form-data">
     <div class="image">
-        <img src="/logo2.png" alt="logo2" class="logo2">
+        <img src="https://drive.google.com/file/d/1JB3A7tGCK2GLgxO0xDg2Hc2k7W4d8q6J/view?usp=sharing" alt="logo2" class="logo2">
     </div>
     <h3>Crear cuenta</h3>
     <div class="radio-group">
@@ -84,16 +86,17 @@
     <input type="text" name="apellidos" placeholder="Apellidos" class="input-field">
     <input type="email" name="correoElectronico" placeholder="Correo electrónico" class="input-field">
     <input type="tel" name="telefono" placeholder="Teléfono" class="input-field">
-    <label class="file-label">Sube una imagen:</label>
-    <input type="file" name="foto" class="file-input" id="fileInput" accept="image/*">
+
+    <input type="file" name="foto" accept="image/*" class="file-input" />
+
     <input type="password" name="contraseña" placeholder="Contraseña" class="input-field" id="password">
-    <input type="password" placeholder="Corroborar contraseña" class="input-field" id="confirm-password">
+    <input type="password" name="confirm-password" placeholder="Corroborar contraseña" class="input-field" id="confirm-password">
     <label>
         <input type="radio" name="show-password" onclick="togglePassword()"> SHOW
     </label>
     <div class="bottom-buttons">
-        <button type="button" onclick="window.location.href='/cutienda/inicio';" class="button">INICIO</button>
-        <button type="submit" class="button">CREAR CUENTA</button>
+        <button type="button" onclick="window.location.href='/cutienda/login';" class="button">INICIO</button>
+        <button type="submit" class="button" onclick="return validatePasswords()">CREAR CUENTA</button>
     </div>
 </form>
 <script>
@@ -109,8 +112,8 @@
         }
     }
 
-    document.getElementById("uploadForm").addEventListener("submit", function(event) {
-        var fileInput = document.getElementById("fileInput");
+    document.querySelector("form").addEventListener("submit", function(event) {
+        var fileInput = document.querySelector("input[type='file']");
         var file = fileInput.files[0];
         if (file) {
             var fileType = file.type;
@@ -125,5 +128,32 @@
         }
     });
 </script>
+<!-- Script para mostrar notificación con SweetAlert2 -->
+<!-- Script para mostrar notificación con SweetAlert2 -->
+<script th:inline="javascript">
+    let errorMessage = /*[[${error} ?: '']]*/ '';
+    let successMessage = /*[[${mensaje} ?: '']]*/ '';
+
+    if (errorMessage !== '') {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error de registro',
+            text: errorMessage,
+            timer: 3000,
+            showConfirmButton: false
+        });
+    }
+
+    if (successMessage !== '') {
+        Swal.fire({
+            icon: 'success',
+            title: 'Registro exitoso',
+            text: successMessage,
+            timer: 3000,
+            showConfirmButton: false
+        });
+    }
+</script>
+
 </body>
 </html>

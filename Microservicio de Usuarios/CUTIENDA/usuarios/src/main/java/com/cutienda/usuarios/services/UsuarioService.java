@@ -24,9 +24,6 @@ public class UsuarioService {
         return usuarioRepository.save(usuario);
     }
 
-
-
-
     public Usuario autenticar(String correoElectronico, String contraseña) {
         Usuario usuario = usuarioRepository.findByCorreoElectronico(correoElectronico);
 
@@ -45,12 +42,42 @@ public class UsuarioService {
         }
     }
 
+    public Usuario buscarUsuario(String nombre, String apellidos, String correoElectronico, String telefono) {
+        return usuarioRepository.findByNombreAndApellidosAndCorreoElectronicoAndTelefono(
+                nombre, apellidos, correoElectronico, telefono).orElse(null);
+    }
+
+    // Metodo para actualizar la contraseña de un usuario
+    public void actualizarContraseña(String id, String nuevaContraseña) {
+        Usuario usuario = usuarioRepository.findById(id).orElseThrow(() ->
+                new RuntimeException("Usuario no encontrado"));
+         usuario.setContraseña(nuevaContraseña);// Asigna la nueva contraseña directamente
+        usuario.setConfirmacionContraseña(nuevaContraseña);
+        usuarioRepository.save(usuario);
+    }
+
+    public void actualizarUsuario(Usuario usuario) {
+        // Verificar si el usuario existe
+        if (usuario == null || usuario.getId() == null) {
+            throw new RuntimeException("El ID del usuario es nulo.");
+        }
+
+        if (!usuarioRepository.existsById(usuario.getId())) {
+            throw new RuntimeException("Usuario no encontrado con el ID: " + usuario.getId());
+        }
+
+        try {
+            // Guardar el usuario actualizado en la base de datos
+            usuarioRepository.save(usuario);
+        } catch (Exception e) {
+            throw new RuntimeException("Error al actualizar el usuario: " + e.getMessage());
+        }
+    }
+
+
     @org.jetbrains.annotations.NotNull
     private byte[] almacenarFoto(MultipartFile foto) throws IOException {
         // Convertir el archivo a bytes
         return foto.getBytes();
     }
-
-
-
 }

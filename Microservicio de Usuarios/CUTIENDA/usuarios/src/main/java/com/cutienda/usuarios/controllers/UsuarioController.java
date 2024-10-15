@@ -5,6 +5,7 @@ import com.cutienda.usuarios.services.UsuarioService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +13,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 
 @Controller
@@ -108,10 +111,6 @@ public class UsuarioController {
         }
     }
 
-
-
-
-
     @PostMapping("/login")
     public String iniciarSesion(
             @RequestParam("correoElectronico") String correoElectronico,
@@ -170,10 +169,8 @@ public class UsuarioController {
 
     @GetMapping("/recovery")
     public String recovery() {
-        return "recovery";
+        return "Recovery";
     }
-
-
 
     @ExceptionHandler(Exception.class)
     public String handleException(Exception e, RedirectAttributes redirectAttributes, HttpServletRequest request) {
@@ -187,5 +184,106 @@ public class UsuarioController {
             return "redirect:/cutienda/login";
         }
     }
+
+    @PostMapping("/recuperar")
+    public String recuperarContraseña(
+            @RequestParam String nombre,
+            @RequestParam String apellidos,
+            @RequestParam String correo,
+            @RequestParam(required = false) String telefono,
+            @RequestParam String newPassword,
+            RedirectAttributes redirectAttributes) {
+
+        // Verificar si el usuario existe
+        Usuario usuario = usuarioService.buscarUsuario(nombre, apellidos, correo, telefono);
+        if (usuario != null) {
+            // Si el usuario es encontrado, se puede proceder a cambiar la contraseña
+            usuarioService.actualizarContraseña(usuario.getId(), newPassword); // Actualiza la contraseña
+            redirectAttributes.addFlashAttribute("message", "Contraseña cambiada exitosamente.");
+            return "redirect:/cutienda/login"; // Redirige al usuario a la página de login después de cambiar la contraseña
+        } else {
+            redirectAttributes.addFlashAttribute("error", "Usuario no encontrado.");
+            return "redirect:/cutienda/recovery"; // Retorna a la página de recuperación de contraseña
+        }
+    }
+
+    @GetMapping("/verificarUsuario")
+    @ResponseBody // Para que la respuesta sea devuelta como JSON
+    public ResponseEntity<Map<String, Object>> verificarUsuario(
+            @RequestParam String nombre,
+            @RequestParam String apellidos,
+            @RequestParam String correo,
+            @RequestParam(required = false) String telefono) {
+
+        Map<String, Object> response = new HashMap<>();
+        Usuario usuario = usuarioService.buscarUsuario(nombre, apellidos, correo, telefono);
+
+        if (usuario != null) {
+            response.put("usuarioEncontrado", true);
+            // Aquí puedes agregar más información si lo necesitas
+        } else {
+            response.put("usuarioEncontrado", false);
+        }
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/perfil/actualizar")
+    public String actualizarPerfil(
+            @RequestParam("nombre") String nombre,
+            @RequestParam("apellidos") String apellidos,
+            @RequestParam("correoElectronico") String correoElectronico,
+            @RequestParam("telefono") String telefono,
+            @RequestParam(required = false) String nuevaContraseña,
+            @RequestParam(required = false) String confirmacionContraseña,
+            @RequestParam(required = false) MultipartFile foto,
+            HttpSession session,
+            RedirectAttributes redirectAttributes) {
+
+        try {
+            Usuario usuario = (Usuario) session.getAttribute("usuario");
+
+            if (usuario == null || usuario.getId() == null) {
+                redirectAttributes.addFlashAttribute("error", "Debes iniciar sesión para actualizar tu perfil.");
+                return "redirect:/cutienda/login";
+            }
+
+            // Actualiza los datos del usuario
+            usuario.setNombre(nombre);
+            usuario.setApellidos(apellidos);
+            usuario.setCorreoElectronico(correoElectronico);
+            usuario.setTelefono(telefono);
+
+            // Si se proporciona una nueva contraseña, validarla y actualizar
+            if (nuevaContraseña != null && !nuevaContraseña.isEmpty()) {
+                if (!nuevaContraseña.equals(confirmacionContraseña)) {
+                    redirectAttributes.addFlashAttribute("error", "Las contraseñas no coinciden.");
+                    return "redirect:/cutienda/perfil";
+                }
+                usuario.setContraseña(nuevaContraseña); // Asegúrate de que la lógica de actualización sea la correcta.
+            }
+
+            // Manejar la imagen de perfil
+            if (foto != null && !foto.isEmpty()) {
+                byte[] imagenBytes = foto.getBytes();
+                usuario.setFotoUrl(imagenBytes);
+            }
+
+            // Actualizar el usuario en la base de datos
+            usuarioService.actualizarUsuario(usuario);
+
+            // Actualizar la sesión con el nuevo usuario
+            session.setAttribute("usuario", usuario);
+            redirectAttributes.addFlashAttribute("mensaje", "Perfil actualizado con éxito.");
+
+            return "redirect:/cutienda/perfil";
+        } catch (IOException e) {
+            redirectAttributes.addFlashAttribute("error", "Error al cargar la foto: " + e.getMessage());
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Error al actualizar perfil: " + e.getMessage());
+        }
+
+        return "redirect:/cutienda/perfil"; // Redirige de vuelta al perfil en caso de error
+    }
+
 
 }

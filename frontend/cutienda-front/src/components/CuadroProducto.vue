@@ -1,0 +1,159 @@
+<script setup>
+import axios from 'axios';
+import { defineProps, ref, onMounted } from 'vue';
+
+const props = defineProps({
+    producto: {
+        type: Object,
+        required: true
+    }
+});
+
+var foto = ref(null);
+
+let fetchFoto = async () => {
+    try {
+        const response = await axios.get(props.producto.foto, {
+            responseType: 'blob'
+        });
+        foto.value = URL.createObjectURL(response.data); 
+        console.log(foto.value)
+    } catch(error) {
+        alert('Error obteniendo la foto')
+    }
+};
+
+// Cargar la foto al montar el componente
+onMounted(fetchFoto);
+</script>
+
+<template>
+<div class="container">
+	<div class="table">
+		<div class="table-header">
+			<div class="header__item"><a id="name" class="filter__link" href="#">PRODUCTO</a></div>
+			<div class="header__item"><a id="wins" class="filter__link filter__link--number" href="#">NOMBRE</a></div>
+			<div class="header__item"><a id="draws" class="filter__link filter__link--number" href="#">PRECIO</a></div>
+			<div class="header__item"><a id="losses" class="filter__link filter__link--number" href="#">VENDEDOR</a></div>
+			<div class="header__item"><a id="total" class="filter__link filter__link--number" href="#">DESCRIPCION</a></div>
+		</div>
+		<div class="table-content">	
+			<div class="table-row">		
+				<div class="table-data"><img class="foto" :src="foto" alt=""></div>
+				<div class="table-data">{{ producto.nombre }}</div>
+				<div class="table-data">{{ producto.precio }}</div>
+				<div class="table-data">{{ producto.vendedor }}</div>
+				<div class="table-data">{{producto.descripcion}}</div>
+			</div>
+		</div>	
+	</div>
+</div>
+</template>
+
+<style>
+.foto {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+} 
+/* ---------------------------------------------------------------*/
+@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700');
+
+:root {
+    --base-spacing-unit: 24px;
+    --alf-spacing-unit: calc(var(--base-spacing-unit) / 2); /* Usando CSS custom property */
+    
+    --color-alpha: #1772FF;
+    --color-form-highlight: #EEEEEE;
+}
+
+*, *:before, *:after {
+    box-sizing: border-box;
+}
+
+body {
+    padding: var(--base-spacing-unit); /* Usando variable */
+    font-family: 'Source Sans Pro', sans-serif;
+    margin: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    margin: 0;
+}
+
+.container {
+    max-width: 1000px;
+    margin-right: auto;
+    margin-left: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.table {
+    width: 100%;
+    border: 1px solid var(--color-form-highlight); /* Usando variable */
+}
+
+.table-header {
+    display: flex;
+    width: 100%;
+    background: #000;
+    padding: calc(var(--alf-spacing-unit) * 1.5) 0; /* Usando variable */
+}
+
+.table-row {
+    display: flex;
+    width: 100%;
+    padding: calc(var(--alf-spacing-unit) * 1.5) 0; /* Usando variable */
+}
+
+.table-row:nth-of-type(odd) {
+    background: var(--color-form-highlight); /* Usando variable */
+}
+
+.table-data, .header__item {
+    flex: 1 1 20%;
+    display: flex;
+    align-items: center ;
+    justify-content: space-around;
+    text-align: center;
+}
+
+.table-data {
+    font-size: 1.5rem;
+}
+
+.header__item {
+    text-transform: uppercase;
+}
+
+.filter__link {
+    color: white;
+    text-decoration: none;
+    position: relative;
+    display: inline-block;
+    padding-left: var(--base-spacing-unit); /* Usando variable */
+    padding-right: var(--base-spacing-unit); /* Usando variable */
+}
+
+.filter__link::after {
+    content: '';
+    position: absolute;
+    right: calc(-1 * var(--alf-spacing-unit) * 1.5); /* Usando variable */
+    color: white;
+    font-size: var(--alf-spacing-unit); /* Usando variable */
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.filter__link.desc::after {
+    content: '(desc)';
+}
+
+.filter__link.asc::after {
+    content: '(asc)';
+}
+
+</style>

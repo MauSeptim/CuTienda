@@ -150,6 +150,49 @@ html, body {
     height: 59px;
 }
 
+.filtro-bar {
+    margin: auto;
+    border: #F5004F 1px solid;
+    width: 63vw;
+    height: auto;
+    margin-top: 50vh;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.agregar-filtro-container {
+    display: flex;
+    border: #3242F9 4px solid;
+    padding: 5px 0;
+    text-decoration: none;
+    width: fit-content;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.agregar-filtro-container span {
+    font-size: 2em;
+    color: #F5F5F5;
+}
+.agregar-filtro-container p {
+    font-size: 1em;
+    padding-left: 8px;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #F5F5F5;
+}
+
+.agregar-filtro-container:hover span, 
+.agregar-filtro-container:hover p {
+    transition: color 0.3s ease; /* Animación de cambio de fondo */
+    color: #5893ff;
+}
+
+.agregar-filtro-container:active span,
+.agregar-filtro-container:active p {
+    transition: color 0.1s ease; /* Animación de cambio de fondo */
+    color: #F5004F;
+}
 
 #productos {
     width: 100%;

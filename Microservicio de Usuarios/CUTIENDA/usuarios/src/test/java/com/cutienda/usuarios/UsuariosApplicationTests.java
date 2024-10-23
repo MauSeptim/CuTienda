@@ -1,10 +1,10 @@
-package com.cutienda.usuarios;
+package com.cutienda;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class UsuariosApplicationTests {
+class MicroservicioProductosApplicationTests {
 
 	@Test
 	void contextLoads() {

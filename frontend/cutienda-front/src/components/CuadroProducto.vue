@@ -99,6 +99,20 @@ h1, h2, h3, h4, h5, h6 {
     box-shadow: 30px 28px 20px rgba(0, 0, 0, 0.2);
 }
 
+.table:hover .table-header, .table-row{
+    transition: 0.3s ease;
+    background-color: #262626;
+    cursor: pointer;
+}
+.table:hover {
+    transition: 0.3s ease;
+    border: #18ebff 3px solid;
+}
+.table:hover a{
+    transition: 0.9s ease;
+    color: #18ebff;
+}
+
 .table-header {
     display: flex;
     width: 100%;

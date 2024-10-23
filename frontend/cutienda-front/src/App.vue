@@ -38,7 +38,8 @@ const buscarProductos = async (query) => {
   
       <CuadroProducto v-for="producto in productos" 
                       :key="producto.id" 
-                      :producto="producto"/>
+                      :producto="producto"
+                      class="iter-cuadro"/>
     </div>  
 </template>
 
@@ -89,5 +90,9 @@ body {
   gap: 10px;   /* Espacio entre los botones */
   margin: 20px; /* Margen para separarlos un poco del borde */
 
+}
+
+.iter-cuadro {
+  margin-bottom: -38vh;
 }
 </style>

@@ -13,12 +13,15 @@ const props = defineProps({
 .boton-azul {
     cursor: pointer;
     border-radius: 5px;
-    padding: 15px 29px;
+    padding: 20px 29px;
     width: auto;
     height: 4vh;
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: 'Source Sans Pro', sans-serif, Helvetica;
+    font-size: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     color: #F5F5F5;
-    text-align: center;
     border: none;
     background-color: #4471C4;
 }

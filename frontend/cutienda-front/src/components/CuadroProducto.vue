@@ -64,7 +64,7 @@ onMounted(fetchFoto);
     --alf-spacing-unit: calc(var(--base-spacing-unit) / 2); /* Usando CSS custom property */
     
     --color-alpha: #1772FF;
-    --color-form-highlight: #EEEEEE;
+    --color-form-highlight: #001a52;
 }
 
 *, *:before, *:after {
@@ -83,17 +83,20 @@ h1, h2, h3, h4, h5, h6 {
 
 .container {
     max-width: 1000px;
+    width: 63vw;
     margin-right: auto;
     margin-left: auto;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+    box-shadow: inset;
 }
 
 .table {
     width: 100%;
     border: 1px solid var(--color-form-highlight); /* Usando variable */
+    box-shadow: 30px 28px 20px rgba(0, 0, 0, 0.2);
 }
 
 .table-header {
@@ -123,6 +126,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .table-data {
     font-size: 1.5rem;
+    color: white;
 }
 
 .header__item {

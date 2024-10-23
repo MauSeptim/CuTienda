@@ -30,6 +30,7 @@
 <script>
 import Swal from 'sweetalert2';
 import CutiendaLeon from '../icons/CutiendaLeon.vue';
+import axios from 'axios';
 
 export default {
   components: {
@@ -56,7 +57,7 @@ export default {
       }
       const fileType = file.type;
       if (!fileType.startsWith('image/')) {
-        alert('Formato no válido. Por favor, sube una imagen.');
+        this.showAlert('Formato no válido. Por favor, sube una imagen.');
       } else {
         this.foto = file;
       }
@@ -72,14 +73,47 @@ export default {
       this.$router.push('/cutienda/login');
     },
     submitForm() {
-      if (this.contraseña !== this.confirmPassword) {
-        this.showAlert('Error de registro', 'Las contraseñas no coinciden', 'error');
-        return;
-      }
+  // Validar que las contraseñas coincidan antes de enviar el formulario
+  if ([this.nombre, this.apellidos, this.correoElectronico, this.telefono].some(str => str.trim() == "")) {
+    this.showAlert('Error de registro', 'LLene todos los campos por favor', 'error');
+    return;
+  }
+  if (this.contraseña !== this.confirmPassword) {
+    this.showAlert('Error de registro', 'Las contraseñas no coinciden', 'error');
+    return;
+  }
+  if (this.userType !== 'admin' && this.userType !== 'client') {
+    this.showAlert('Error de registro', 'Eliga por favor si es cliente o admin', 'error')
+    return;
+  }
 
-      // Aquí puedes agregar el código para enviar el formulario
-      this.showAlert('Registro exitoso', 'Cuenta creada correctamente', 'success');
-    },
+  // Crear un objeto FormData para enviar los datos junto con la foto
+  const formData = new FormData();
+  formData.append('nombre', this.nombre);
+  formData.append('apellidos', this.apellidos);
+  formData.append('correoElectronico', this.correoElectronico);
+  formData.append('telefono', this.telefono);
+  formData.append('tipo', this.userType);  // El tipo de usuario (admin o cliente)
+  formData.append('contraseña', this.contraseña);
+  formData.append('confirm-password', this.confirmPassword);
+  formData.append('foto', this.foto); // La imagen seleccionada
+
+  // Hacer la solicitud POST a la API
+  axios.post('http://localhost:8011/cutienda/registro', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  })
+  .then(response => {
+    // Si la solicitud es exitosa, muestra el mensaje de éxito
+    this.showAlert('Registro exitoso', 'Cuenta creada correctamente', 'success');
+  })
+  .catch(error => {
+    // Si hay un error, muestra el mensaje de error
+    this.showAlert('Error de registro', 'Conexion rechazada, error al crear la cuenta', 'error');
+  });
+},
+
     showAlert(title, text, icon) {
       Swal.fire({
         title: title,

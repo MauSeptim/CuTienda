@@ -19,6 +19,7 @@ import java.util.Map;
 
 @Controller
 @RequestMapping("/cutienda")
+@CrossOrigin(origins = "*")
 public class UsuarioController {
 
     @Autowired

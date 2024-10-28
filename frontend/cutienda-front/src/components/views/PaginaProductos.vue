@@ -1,13 +1,14 @@
 <script setup>
 import {ref} from 'vue'
-//import CuadroProducto from './ /components/CuadroProducto.vue';
 import CutiendaLeon from '../icons/CutiendaLeon.vue';
 import BarraBusqueda from '../BarraBusqueda.vue';
 import boton from '../Boton.vue';
 import axios from 'axios';
 import CuadroProducto from '../CuadroProducto.vue';
+import { useRouter } from 'vue-router';
 
 let productos = ref([]);
+const router = useRouter()
 
 // Función para buscar productos en la API
 const buscarProductos = async (query) => {
@@ -20,6 +21,10 @@ const buscarProductos = async (query) => {
   }
 };
 
+const aPerfil = () => {
+    router.push('Usuario');
+};
+
 </script>
 
 <template>
@@ -30,7 +35,7 @@ const buscarProductos = async (query) => {
     </nav>
     <div class="botones-superiores" id="botones-superiores">
       <boton :texto="'Notificaciones'"/>
-      <boton :texto="'Perfil'"/>
+      <boton :texto="'Perfil'" @click="aPerfil"/>
     </div>
   
     <BarraBusqueda class="barra" @buscar-productos="buscarProductos"/>

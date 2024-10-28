@@ -2,7 +2,8 @@
   <div>
     <!-- Encabezado -->
     <header class="encabezado">
-        <CutiendaLeon class="logo2"/>
+        <CutiendaLeon />
+        <Boton class="botones-superiores" :texto="'Buscar productos'" @click="prod"/>
     </header>
 
     <!-- Contenedor Principal -->
@@ -10,113 +11,114 @@
       <!-- Sección de Perfil -->
       <section class="profile-section">
         <img :src="usuarioFoto" alt="Imagen de Perfil" class="profile-image" />
-        <label for="profile-image" class="profile-label">Cambiar Imagen</label>
-        <input type="file" id="profile-image" @change="previewImage" accept="image/*" />
+        <p class="profile-name">{{ usuario.nombre }} {{ usuario.apellidos }}</p>
       </section>
 
-      <!-- Formulario -->
-      <section class="form-section">
-        <div class="tabs">
-          <label>
-            <input type="radio" value="admin" v-model="usuario.tipo" /> ADMINISTRADOR
-          </label>
-          <label>
-            <input type="radio" value="client" v-model="usuario.tipo" /> CLIENTE
-          </label>
+      <!-- Tabs -->
+      <nav class="tabs">
+        <ul>
+          <li  @click="cambiarTab('perfil')" :class="{ active: tabActiva === 'perfil' }">Perfil</li>
+          <li @click="cambiarTab('notificaciones')" :class="{ active: tabActiva === 'notificaciones' }">Notificaciones</li>
+          <li @click="cambiarTab('configuracion')" :class="{ active: tabActiva === 'configuracion' }">Configuración</li>
+        </ul>
+      </nav>
+
+      <!-- Contenido de las Tabs -->
+      <section class="tab-content">
+        <div v-if="tabActiva === 'perfil'" class="perfil-content">
+          <h2>Información del Perfil</h2>
+          <p><strong>Correo Electrónico:</strong> {{ usuario.correoElectronico }}</p>
+          <p><strong>Teléfono:</strong> {{ usuario.telefono }}</p>
+          <button @click="activarEdicion" class="edit-button">Editar</button>
         </div>
 
-        <form @submit.prevent="guardarCambios">
-          <div v-for="(campo, index) in camposFormulario" :key="index" class="form-group">
-            <label :for="campo.id">{{ campo.label }}</label>
-            <input :type="campo.type" :id="campo.id" v-model="usuario[campo.modelo]" :required="campo.required" />
-          </div>
+        <div v-else-if="tabActiva === 'notificaciones'" class="notificaciones-content">
+          <h2>Notificaciones</h2>
+          <p>Aquí puedes ver tus notificaciones.</p>
+        </div>
 
-          <label class="show-password">
-            <input type="checkbox" @click="togglePassword" /> Mostrar Contraseña
-          </label>
+        <div v-else-if="tabActiva === 'configuracion'" class="configuracion-content">
+          <h2>Configuración</h2>
+          <p>Aquí puedes ajustar la configuración de tu cuenta.</p>
+        </div>
 
-          <div class="buttons">
-            <button type="submit" class="save">Guardar Cambios</button>
-            <router-link to="/login" class="home">Inicio</router-link>
-            <button type="button" @click="confirmDelete" class="delete">Eliminar Cuenta</button>
-          </div>
-        </form>
+        <!-- Formulario de Edición (visible solo en modo edición) -->
+        <section v-if="modoEdicion" class="form-section">
+          <form @submit.prevent="guardarCambios">
+            <div v-for="(campo, index) in camposFormulario" :key="index" class="form-group">
+              <label :for="campo.id">{{ campo.label }}</label>
+              <input :type="campo.type" :id="campo.id" v-model="usuario[campo.modelo]" :required="campo.required" />
+            </div>
+
+            <div class="buttons">
+              <button type="submit" class="save">Guardar Cambios</button>
+              <button type="button" @click="cancelarEdicion" class="cancel">Cancelar</button>
+            </div>
+          </form>
+        </section>
       </section>
     </div>
   </div>
 </template>
+
 <script>
 import Swal from "sweetalert2";
 import CutiendaLeon from "../icons/CutiendaLeon.vue";
+import Boton from "../Boton.vue";
 
 export default {
-  data() {
+    name: 'PaginaUsuario',
+    components: {
+        CutiendaLeon,
+        Boton,
+    },
+    data() {
     return {
-      usuario: {
-        nombre: "",
-        apellidos: "",
-        correoElectronico: "",
-        telefono: "",
-        contrasena: "",
-        confirmacionContraseña: "",
-        tipo: "client",
-      },
-      mostrarPassword: false,
+
+        usuario: {
+            nombre: "Juan",
+            apellidos: "Pérez",
+            correoElectronico: "juan.perez@example.com",
+            telefono: "555-1234",
+            contrasena: "",
+        },
+      modoEdicion: false,
+      tabActiva: "perfil",
       camposFormulario: [
         { id: "nombre", label: "Nombre", type: "text", modelo: "nombre", required: true },
         { id: "apellidos", label: "Apellidos", type: "text", modelo: "apellidos", required: true },
         { id: "correoElectronico", label: "Correo Electrónico", type: "email", modelo: "correoElectronico", required: true },
         { id: "telefono", label: "Teléfono", type: "tel", modelo: "telefono", required: true },
         { id: "contrasena", label: "Contraseña", type: "password", modelo: "contrasena", required: true },
-        { id: "confirmacionContraseña", label: "Confirmar Contraseña", type: "password", modelo: "confirmacionContraseña", required: true },
       ],
       usuarioFoto: "/path/to/default/image.png",
     };
   },
   methods: {
+    prod() {
+        this.$router.push('Productos');
+    },
+    cambiarTab(tab) {
+      this.tabActiva = tab;
+    },
+    activarEdicion() {
+      this.modoEdicion = true;
+    },
+    cancelarEdicion() {
+      this.modoEdicion = false;
+    },
     guardarCambios() {
+      this.modoEdicion = false;
       Swal.fire("Guardado con éxito", "Tus cambios han sido guardados", "success");
-    },
-    confirmDelete() {
-      Swal.fire({
-        title: "¿Estás seguro?",
-        text: "No podrás revertir esto",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Sí, eliminar cuenta",
-        cancelButtonText: "Cancelar",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          // Acción de eliminación de cuenta
-          Swal.fire("Eliminado", "Tu cuenta ha sido eliminada", "success").then(() => {
-            this.$router.push("/login");
-          });
-        }
-      });
-    },
-    togglePassword() {
-      this.mostrarPassword = !this.mostrarPassword;
-      const tipo = this.mostrarPassword ? "text" : "password";
-      this.camposFormulario.forEach((campo) => {
-        if (campo.modelo === "contrasena" || campo.modelo === "confirmacionContraseña") {
-          campo.type = tipo;
-        }
-      });
-    },
-    previewImage(event) {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          this.usuarioFoto = e.target.result;
-        };
-        reader.readAsDataURL(file);
-      }
     },
   },
 };
 </script>
+
 <style scoped>
+* {
+    color: #f9f9f9;
+}
 body {
   color: white;
   font-family: Arial, sans-serif;
@@ -126,35 +128,36 @@ body {
 }
 .encabezado {
   background-color: #001f5f;
+  height: 5rem;
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
   padding: 20px 0;
-  text-align: center;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
-.logo2 {
-  width: 150px;
-  height: auto;
+.encabezado img {
+  width: 5rem;
+  height: 5rem;
+  border: 0.5rem solid #4472c4;
+  transform: translateY(-30px);
 }
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: start;
   gap: 20px;
 }
-.profile-section,
-.form-section {
+.profile-section {
   background-color: #002160;
   border-radius: 10px;
   padding: 20px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-}
-.profile-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
+  text-align: center;
 }
 .profile-image {
   width: 150px;
@@ -163,17 +166,64 @@ body {
   object-fit: cover;
   border: 3px solid #ffffff;
 }
-.profile-label {
-  margin-top: 10px;
+.profile-name {
+  margin: 10px 0;
+  font-size: 18px;
   font-weight: bold;
-  cursor: pointer;
   color: #f0f0f0;
 }
-.form-section .tabs {
+.tabs {
+  margin: 20px 0;
+}
+.tabs ul {
   display: flex;
-  justify-content: center;
-  margin-bottom: 15px;
-  gap: 10px;
+  list-style-type: none;
+  padding: 0;
+  gap: 5px;
+}
+.buttons, .tabs li {
+  cursor: pointer;
+  padding: 10px 15px;
+  border-radius: 5px;
+  background-color: #003366;
+  transition: background-color 0.3s;
+}
+.tabs li:hover {
+  background-color: #004080;
+}
+.tabs li.active {
+  background-color: #4e73df;
+}
+.tab-content {
+  width: 100%;
+  max-width: 600px;
+}
+.perfil-content,
+.notificaciones-content,
+.configuracion-content {
+  background-color: #002160;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+.perfil-content h2, p{
+    padding: 15px 0;
+}
+.edit-button {
+  background-color: #4e73df;
+  color: white;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+.edit-button:hover {
+  background-color: #3a61c9;
+}
+.form-section {
+  margin-top: 20px;
 }
 .form-group {
   margin-bottom: 15px;
@@ -190,45 +240,34 @@ body {
   outline: none;
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
 }
-.show-password {
-  display: block;
-  margin-top: 10px;
-  font-size: 14px;
-  color: #ccc;
-}
 .buttons {
   display: flex;
   justify-content: space-between;
   margin-top: 20px;
 }
-.buttons button,
-.buttons .home {
+.buttons button {
   background-color: #28a745;
   color: white;
   padding: 10px 20px;
   border: none;
   border-radius: 5px;
   font-weight: bold;
+  cursor: pointer;
   transition: background-color 0.3s, box-shadow 0.3s;
 }
-.buttons .delete {
-  background-color: #dc3545;
-}
-.buttons .home {
+.buttons .cancel {
   background-color: #6c757d;
 }
-.buttons button:hover,
-.buttons .home:hover {
+.buttons button:hover {
   box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
 }
-@media (min-width: 768px) {
-  .container {
-    flex-direction: row;
-    gap: 40px;
-  }
-  .profile-section,
-  .form-section {
-    width: 45%;
-  }
+.botones-superiores {
+  position: absolute;
+  top: 0;      /* Alínea al borde superior */
+  right: 0;    /* Alínea al borde derecho */
+  display: flex;
+  gap: 10px;   /* Espacio entre los botones */
+  margin: 20px; /* Margen para separarlos un poco del borde */
+
 }
 </style>

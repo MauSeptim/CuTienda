@@ -6,7 +6,7 @@ import PaginaUsuario from './components/views/PaginaUsuario.vue';
 </script>
 
 <template>
-  <PaginaUsuario/>
+  <PaginaUsuario/>r
 </template>
 
 <style >

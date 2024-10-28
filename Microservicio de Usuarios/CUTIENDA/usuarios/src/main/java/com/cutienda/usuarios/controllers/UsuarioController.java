@@ -2,46 +2,35 @@ package com.cutienda.usuarios.controllers;
 
 import com.cutienda.usuarios.models.Usuario;
 import com.cutienda.usuarios.services.UsuarioService;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-
-@Controller
+@RestController
 @RequestMapping("/cutienda")
-@CrossOrigin(origins = "*")
 public class UsuarioController {
 
     @Autowired
     private UsuarioService usuarioService;
 
-    @GetMapping("/registro")
-    public String mostrarFormularioRegistro(Model model) {
-        model.addAttribute("usuario", new Usuario());
-        return "FormRegistro";
-    }
-
     @PostMapping("/registro")
-    public String registrarUsuario(
+    public ResponseEntity<Map<String, Object>> registrarUsuario(
             @RequestParam("nombre") String nombre,
             @RequestParam("apellidos") String apellidos,
-            @RequestParam("correoElectronico") String correoElectronico,
+            @RequestParam("email") String correoElectronico,
             @RequestParam("telefono") String telefono,
-            @RequestParam("tipo") String tipo,
-            @RequestParam("contraseña") String contraseña,
-            @RequestParam("confirm-password") String confirmacionContraseña,
-            @RequestParam("foto") MultipartFile foto,
-            RedirectAttributes redirectAttributes) {
+            @RequestParam("role") String tipo,
+            @RequestParam("password") String contraseña,
+            @RequestParam("confirmPassword") String confirmacionContraseña,
+            @RequestParam("foto") MultipartFile foto) {
+
+        Map<String, Object> response = new HashMap<>();
 
         try {
             Usuario usuario = new Usuario();
@@ -55,161 +44,86 @@ public class UsuarioController {
 
             // Validar las contraseñas
             if (!contraseña.equals(confirmacionContraseña)) {
-                throw new IllegalArgumentException("Las contraseñas no coinciden");
+                return ResponseEntity.badRequest().body(Map.of("error", "Las contraseñas no coinciden"));
             }
 
             // Almacenar la foto directamente como bytes en el objeto Usuario
             if (foto != null && !foto.isEmpty()) {
-                byte[] imagenBytes = foto.getBytes(); // Obtener los bytes de la foto
-                usuario.setFotoUrl(imagenBytes); // Establecer los bytes en el objeto Usuario
+                byte[] imagenBytes = foto.getBytes();
+                usuario.setFotoUrl(imagenBytes);
             } else {
-                throw new IllegalArgumentException("La foto es obligatoria");
+                return ResponseEntity.badRequest().body(Map.of("error", "La foto es obligatoria"));
             }
 
             // Registrar el usuario en la base de datos
-            usuarioService.registrarUsuario(usuario); // Guardar el usuario en la base de datos
-            redirectAttributes.addFlashAttribute("mensaje", "Usuario registrado con éxito");
+            usuarioService.registrarUsuario(usuario);
+            response.put("mensaje", "Usuario registrado con éxito");
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
 
-            return "redirect:/cutienda/registro"; // Redirige a la página de éxito
         } catch (IOException e) {
-            redirectAttributes.addFlashAttribute("error", "Error al cargar la foto: " + e.getMessage());
-        } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Error al cargar la foto: " + e.getMessage()));
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Error al registrar usuario: " + e.getMessage());
-        }
-
-        return "redirect:/cutienda/registro"; // Redirige de vuelta al formulario en caso de error
-    }
-
-
-
-
-
-    @GetMapping("/registroExitoso")
-    public String registroExitoso() {
-        return "registroExitoso";
-    }
-
-    @GetMapping("/login")
-    public String mostrarInicio() {
-        return "login";
-    }
-
-    @GetMapping("/perfil")
-    public String mostrarPerfil(HttpSession session, Model model, RedirectAttributes redirectAttributes) {
-        // Recuperar el usuario desde la sesión
-        Usuario usuario = (Usuario) session.getAttribute("usuario");
-
-        if (usuario != null) {
-            // Pasar el usuario completo al modelo para mostrarlos en el perfil
-            model.addAttribute("usuario", usuario);
-            return "perfilUsuario"; // Asegúrate de que esta vista exista
-        } else {
-            // Agregar un mensaje de error y redirigir a la página de inicio de sesión si no hay usuario en la sesión
-            redirectAttributes.addFlashAttribute("error", "Debe iniciar sesión para acceder al perfil.");
-            return "redirect:/cutienda/login";
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Error al registrar usuario: " + e.getMessage()));
         }
     }
 
     @PostMapping("/login")
-    public String iniciarSesion(
+    public ResponseEntity<Map<String, Object>> iniciarSesion(
             @RequestParam("correoElectronico") String correoElectronico,
             @RequestParam("contraseña") String contraseña,
-            @RequestParam("selectedRole") String selectedRole,
-            RedirectAttributes redirectAttributes,
-            HttpSession session) {
+            @RequestParam("selectedRole") String selectedRole) {
 
+        Map<String, Object> response = new HashMap<>();
         Usuario usuario = usuarioService.autenticar(correoElectronico, contraseña);
 
         if (usuario != null) {
             if (selectedRole.equals(usuario.getTipo())) {
-                // Guardar el usuario en la sesión
-                session.setAttribute("usuario", usuario);
-
-                // Redirigir basado en el rol del usuario
-                if ("admin".equals(usuario.getTipo())) {
-                    return "redirect:/cutienda/perfil"; // Redirige a la página de perfil para administradores
-                } else if ("client".equals(usuario.getTipo())) {
-                    return "redirect:/cutienda/perfil"; // Redirige a la página de perfil para clientes
-                }
+                response.put("usuario", usuario);
+                return ResponseEntity.ok(response);
             } else {
-                // Rol seleccionado no coincide con el rol del usuario
-                redirectAttributes.addFlashAttribute("error", "Rol seleccionado no coincide con el rol del usuario.");
-                return "redirect:/cutienda/login";
+                return ResponseEntity.badRequest().body(Map.of("error", "Rol seleccionado no coincide con el rol del usuario."));
             }
         } else {
-            // Autenticación fallida
-            redirectAttributes.addFlashAttribute("error", "Correo o contraseña incorrectos.");
-            return "redirect:/cutienda/login";
+            return ResponseEntity.badRequest().body(Map.of("error", "Correo o contraseña incorrectos."));
         }
-        return "redirect:/cutienda/login";
     }
 
     @PostMapping("/perfil/eliminar")
-    public String eliminarCuenta(HttpSession session, RedirectAttributes redirectAttributes) {
-        // Obtener el usuario desde la sesión
-        Usuario usuario = (Usuario) session.getAttribute("usuario");
-
-        if (usuario != null) {
-            // Lógica para eliminar la cuenta del usuario
-            usuarioService.eliminar(usuario.getId());
-
-            // Invalidar la sesión
-            session.invalidate();
-
-            // Agregar un mensaje de éxito y redirigir a la página de inicio
-            redirectAttributes.addFlashAttribute("message", "Cuenta eliminada con éxito.");
-            return "redirect:/cutienda/login";
-        } else {
-            // Redirigir a la página de inicio de sesión si no hay usuario en la sesión
-            redirectAttributes.addFlashAttribute("error", "Debes iniciar sesión para eliminar tu cuenta.");
-            return "redirect:/cutienda/login";
-        }
-    }
-
-    @GetMapping("/recovery")
-    public String recovery() {
-        return "Recovery";
-    }
-
-    @ExceptionHandler(Exception.class)
-    public String handleException(Exception e, RedirectAttributes redirectAttributes, HttpServletRequest request) {
-        String requestUrl = request.getRequestURL().toString();
-
-        if (requestUrl.contains("cutienda/registro")) {
-            redirectAttributes.addFlashAttribute("error", "Ocurrió un error durante el registro: " + e.getMessage());
-            return "redirect:/cutienda/registro";
-        } else {
-            redirectAttributes.addFlashAttribute("error", "Error interno: " + e.getMessage());
-            return "redirect:/cutienda/login";
+    public ResponseEntity<Map<String, Object>> eliminarCuenta(@RequestParam("usuarioId") String usuarioId) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            usuarioService.eliminar(usuarioId);
+            response.put("mensaje", "Cuenta eliminada con éxito.");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Error al eliminar cuenta: " + e.getMessage()));
         }
     }
 
     @PostMapping("/recuperar")
-    public String recuperarContraseña(
+    public ResponseEntity<Map<String, Object>> recuperarContraseña(
             @RequestParam String nombre,
             @RequestParam String apellidos,
             @RequestParam String correo,
             @RequestParam(required = false) String telefono,
-            @RequestParam String newPassword,
-            RedirectAttributes redirectAttributes) {
+            @RequestParam String newPassword) {
 
-        // Verificar si el usuario existe
+        Map<String, Object> response = new HashMap<>();
         Usuario usuario = usuarioService.buscarUsuario(nombre, apellidos, correo, telefono);
+
         if (usuario != null) {
-            // Si el usuario es encontrado, se puede proceder a cambiar la contraseña
-            usuarioService.actualizarContraseña(usuario.getId(), newPassword); // Actualiza la contraseña
-            redirectAttributes.addFlashAttribute("message", "Contraseña cambiada exitosamente.");
-            return "redirect:/cutienda/login"; // Redirige al usuario a la página de login después de cambiar la contraseña
+            usuarioService.actualizarContraseña(usuario.getId(), newPassword);
+            response.put("mensaje", "Contraseña cambiada exitosamente.");
+            return ResponseEntity.ok(response);
         } else {
-            redirectAttributes.addFlashAttribute("error", "Usuario no encontrado.");
-            return "redirect:/cutienda/recovery"; // Retorna a la página de recuperación de contraseña
+            return ResponseEntity.badRequest().body(Map.of("error", "Usuario no encontrado."));
         }
     }
 
     @GetMapping("/verificarUsuario")
-    @ResponseBody // Para que la respuesta sea devuelta como JSON
     public ResponseEntity<Map<String, Object>> verificarUsuario(
             @RequestParam String nombre,
             @RequestParam String apellidos,
@@ -219,33 +133,25 @@ public class UsuarioController {
         Map<String, Object> response = new HashMap<>();
         Usuario usuario = usuarioService.buscarUsuario(nombre, apellidos, correo, telefono);
 
-        if (usuario != null) {
-            response.put("usuarioEncontrado", true);
-            // Aquí puedes agregar más información si lo necesitas
-        } else {
-            response.put("usuarioEncontrado", false);
-        }
+        response.put("usuarioEncontrado", usuario != null);
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/perfil/actualizar")
-    public String actualizarPerfil(
+    public ResponseEntity<Map<String, Object>> actualizarPerfil(
+            @RequestParam("usuarioId") Long usuarioId,
             @RequestParam("nombre") String nombre,
             @RequestParam("apellidos") String apellidos,
             @RequestParam("correoElectronico") String correoElectronico,
             @RequestParam("telefono") String telefono,
             @RequestParam(required = false) String nuevaContraseña,
-            @RequestParam(required = false) String confirmacionContraseña,
-            @RequestParam(required = false) MultipartFile foto,
-            HttpSession session,
-            RedirectAttributes redirectAttributes) {
+            @RequestParam(required = false) MultipartFile foto) {
 
+        Map<String, Object> response = new HashMap<>();
         try {
-            Usuario usuario = (Usuario) session.getAttribute("usuario");
-
-            if (usuario == null || usuario.getId() == null) {
-                redirectAttributes.addFlashAttribute("error", "Debes iniciar sesión para actualizar tu perfil.");
-                return "redirect:/cutienda/login";
+            Usuario usuario = usuarioService.buscarUsuario(nombre, apellidos, correoElectronico, telefono);
+            if (usuario == null) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Usuario no encontrado."));
             }
 
             // Actualiza los datos del usuario
@@ -256,11 +162,7 @@ public class UsuarioController {
 
             // Si se proporciona una nueva contraseña, validarla y actualizar
             if (nuevaContraseña != null && !nuevaContraseña.isEmpty()) {
-                if (!nuevaContraseña.equals(confirmacionContraseña)) {
-                    redirectAttributes.addFlashAttribute("error", "Las contraseñas no coinciden.");
-                    return "redirect:/cutienda/perfil";
-                }
-                usuario.setContraseña(nuevaContraseña); // Asegúrate de que la lógica de actualización sea la correcta.
+                usuario.setContraseña(nuevaContraseña);
             }
 
             // Manejar la imagen de perfil
@@ -271,20 +173,14 @@ public class UsuarioController {
 
             // Actualizar el usuario en la base de datos
             usuarioService.actualizarUsuario(usuario);
-
-            // Actualizar la sesión con el nuevo usuario
-            session.setAttribute("usuario", usuario);
-            redirectAttributes.addFlashAttribute("mensaje", "Perfil actualizado con éxito.");
-
-            return "redirect:/cutienda/perfil";
+            response.put("mensaje", "Perfil actualizado con éxito.");
+            return ResponseEntity.ok(response);
         } catch (IOException e) {
-            redirectAttributes.addFlashAttribute("error", "Error al cargar la foto: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Error al cargar la foto: " + e.getMessage()));
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Error al actualizar perfil: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Error al actualizar perfil: " + e.getMessage()));
         }
-
-        return "redirect:/cutienda/perfil"; // Redirige de vuelta al perfil en caso de error
     }
-
-
 }

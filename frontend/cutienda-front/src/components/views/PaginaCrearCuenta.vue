@@ -6,13 +6,16 @@
     </div>
 
     <div class="container">
-      <div class="rol" id="rol">
-        <label>
-          <input type="radio" value="admin" v-model="formData.role" /> ADMINISTRADOR
-        </label>
-        <label>
-          <input type="radio" value="client" v-model="formData.role" /> CLIENTE
-        </label>
+      <div class="roles" id="roles">
+        <CustomRadio
+          class="radio"
+          v-model="formData.role"
+          name="roles"
+          :options="[
+            { id: 'admin', value: 'admin', label: 'ADMINISTRADOR' },
+            { id: 'client', value: 'client', label: 'CLIENTE' }
+          ]"
+        />
       </div>
 
       <div class="inputs" id="inputs">
@@ -126,11 +129,13 @@
 import Swal from "sweetalert2";
 import CutiendaLeon from "../icons/CutiendaLeon.vue";
 import axios from "axios";
+import CustomRadio from '../CustomRadio.vue'; // Asegúrate de importar CustomRadio
 
 export default {
   name: 'PaginaCrearCuenta',
   components: {
     CutiendaLeon,
+    CustomRadio,
   },
   data() {
     return {
@@ -141,7 +146,7 @@ export default {
         email: '',
         telefono: '',
         password: '',
-        foto:'',
+        foto: '',
         role: '',
         confirmPassword: '',
       },
@@ -155,264 +160,172 @@ export default {
 
       // Validaciones específicas por campo
       if (field === 'nombre' || field === 'apellidos') {
-        if (!this.formData[field].trim()) this.errors[field] = 'Este campo es obligatorio';
-      } else if (field === 'correoElectronico') {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(this.formData.email)) {
-          this.errors.correoElectronico = 'Correo no válido';
-        }
-      } else if (field === 'telefono') {
-        const phoneRegex = /^[0-9]{10}$/;
-        if (!phoneRegex.test(this.formData.telefono)) {
-          this.errors.telefono = 'Número de teléfono no válido';
-        }
-      } else if (field === 'contrasena' || field === 'confirmacionContraseña') {
-        if (this.formData.password !== this.formData.confirmPassword) {
-          this.errors.confirmacionContraseña = 'Las contraseñas no coinciden';
-        }
+        if (!this.formData[field].trim()) this.errors[field] = 'Este campo es requerido';
       }
+      // Agrega validaciones adicionales según sea necesario
     },
-    submitForm() {
-      // Validación final antes del envío
-      Object.keys(this.formData).forEach((field) => this.validateField(field));
-      if (Object.values(this.errors).some((error) => error)) return;
-
-      if (!['admin', 'client'].includes(this.formData.role)) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Falta de informacion',
-          text: 'Confirme si es admin o cliente'
-        });
-        return;
-      }
-
-      console.log(this.formData);
-      // Crear un nuevo FormData
-      const formData = new FormData();
-      formData.append('nombre', this.formData.nombre);
-      formData.append('apellidos', this.formData.apellidos);
-      formData.append('email', this.formData.email);
-      formData.append('telefono', this.formData.telefono);
-      formData.append('password', this.formData.password);
-      formData.append('confirmPassword', this.formData.confirmPassword);
-      formData.append('role', this.formData.role);
-      formData.append('foto', this.formData.foto); // Aquí es donde deberías agregar el archivo
-
-
-      axios
-        .post('http://localhost:8011/cutienda/registro', formData,{
-          headers: {
-          'Content-Type':'multipart/form-data'
-          },
-          withCredentials: false,
-        }
-        )
-        .then((response) => {
-          this.registroExitoso();
-        })
-        .catch((e) => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error al registrar',
-            text: 'Error de conexion, por favor intente mas tarde',
-          });
-        });
-    },
-    registroExitoso() {
-      Swal.fire({
-        title: 'Registro exitoso',
-        icon: 'success',
-      }).then((result) => {
-        if (result.isConfirmed) {
-          console.log('REGISTRO EVALUADO');
-        }
-      });
-    },
-    confirmDelete() {
-      Swal.fire({
-        title: "¿Estás seguro de que quieres eliminar tu cuenta?",
-        text: "Esta acción no se puede deshacer.",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#dc3545",
-        confirmButtonText: "Eliminar",
-        cancelButtonText: "Cancelar",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          console.log("Cuenta eliminada");
-          // axios.post('/cutienda/perfil/eliminar')
-        }
+    togglePassword() {
+      // Implementar la lógica para mostrar/ocultar la contraseña
+      const passwordFields = document.querySelectorAll('input[type=password]');
+      passwordFields.forEach(field => {
+        field.type = field.type === 'password' ? 'text' : 'password';
       });
     },
     previewImage(event) {
       const file = event.target.files[0];
       if (file) {
         const reader = new FileReader();
-        reader.onload = (e) => {
+        reader.onload = e => {
           this.profileImageUrl = e.target.result;
           this.formData.foto = file;
         };
         reader.readAsDataURL(file);
       }
     },
+    submitForm() {
+      // Implementar la lógica para enviar el formulario
+
+      //const { nombre, apellidos, email, telefono, password, role, confirmPassword } = this.formData;
+      console.log(this.formData);
+
+      // Validar contraseñas
+      if (this.formData.password !== this.formData.confirmPassword) {
+        Swal.fire('Error', 'Las contraseñas no coinciden', 'error');
+        return;
+      }
+
+      const form = new FormData();
+      form.append("nombre", this.formData.nombre);
+      form.append("apellidos", this.formData.apellidos); 
+      form.append("email", this.formData.email); 
+      form.append("telefono", this.formData.telefono); 
+      form.append("role",this.formData.role); 
+      form.append("password",this.formData.password); 
+      form.append("confirmPassword", this.formData.confirmPassword); 
+      form.append("foto", this.formData.foto);
+
+
+      console.log(form);
+      axios.post('http://localhost:8011/cutienda/registro', form, {
+        headers: {"Content-Type":"multipart/form-data"}
+      })
+      .then(response => {
+        localStorage.setItem("user", {
+          nombre: this.formData.nombre,
+          apellidos: this.formData.apellidos,
+          contraseña: this.formData.password,
+          telefono: this.formData.telefono,
+          correoElectronico: this.formData.email,
+          tipo: this.formData.role,
+          foto: this.formData.foto,
+          confirmacionContraseña: this.formData.confirmPassword,
+        });
+        Swal.fire('Éxito', 'Cuenta creada exitosamente', 'success');
+        this.$router.push('Usuario');
+      })
+      .catch(error => {
+        Swal.fire('Error', 'Hubo un problema al crear la cuenta', 'error');
+      });
+    }
   },
 };
 </script>
 
 <style scoped>
 * {
-  color: white;
-  font-family: Arial, sans-serif;
-  font-size: 0.95em;
-  background-color: #002160;
-  padding: 0;
+  color: #f9f9f9;
 }
-
 .padre {
-  display: flex;
-  justify-content: center;
-}
-
-.encabezado {
-  position: fixed;
-  top: 0;
-  width: 90%;
-  height: 7.9rem;
-  background-color: #002160;
-  padding: 40px 0;
-  border-bottom-left-radius: 12px;
-  border-bottom-right-radius: 12px;
-  text-align: center;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 15px;
 }
-
 .container {
-  margin-top: 150px;
-  width: 62%;
-  background: #002160;
-  padding: 40px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-flow: column;
-}
-
-.encabezado img{
-  width: 5rem;
-  height: 5rem;
-  border: 0.5rem solid #4472c4;
-}
-.encabezado span {
-  font-size: 1.5em;
-  color: #f9f9f9;
-}
-
-.rol {
-  width: 100%;
-  height: auto;
-  display: flex;
-  gap: 15px;
-  justify-content: center;
   align-items: center;
-}
-
-.inputs {
-  display: flex;
-  flex-flow: column;
-  width: 100%;
-  height: auto;
   justify-content: center;
-  padding: 3em 5em 0em 5em;
+  text-align: center;
+  width: 80%;
 }
-.form-group {
-  /* display: grid;
-  grid-template-columns: 1fr 1fr; */
-  display: flex;
-  flex-flow: column;
-  padding-bottom: 30px;
-}
-
-.input-field, .file-input {
-  background-color: #f0f8ff; /* Color de fondo claro */
-  border: 1px solid #ccc; /* Borde más visible */
-  border-radius: 5px; /* Bordes redondeados */
-  color: #333; /* Color del texto */
-  padding: 12px; /* Espaciado interior */
-  margin: 10px 0; /* Espaciado entre inputs */
-  width: 100%; /* 100% de ancho */
-  transition: border-color 0.3s ease; /* Transición suave para el borde */
-}
-.passwordshow {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: row-reverse;
-  gap: 10px;
-}
-/* El resto de tu CSS */
-.profile-section {
-  display: flex;
+.input-field {
+  background-color: #f9f9f9;
+  border: none;
+  border-radius: 30px;
+  outline: none;
+  color: black;
+  padding: 1rem;
+  margin: 20px 0;
   width: 100%;
-  height: auto;
-  justify-content: space-between;
-  flex-flow: row-reverse;
-  align-items: center;
-  padding: 1em;
-  gap: 20px;
-  padding: 0em 0em 0em 0em;
-}
-.profile-section img {
-  width: 4.5rem;
-  height: 5rem;
+  box-shadow: rgba(0, 0, 0, 0.45) 0px 25px 20px -20px;
 }
 .bottom-buttons {
   display: flex;
   justify-content: center;
-  margin-top: 10%;
-}
-
-.button {
-  width: auto;
-  padding: 10px; /* Ajustar el padding para mejorar la apariencia */
-  border: none; /* Sin borde */
-  border-radius: 5px; /* Bordes redondeados */
-  background-color: #0056b3; /* Color de fondo */
-  color: white; /* Color del texto */
-  cursor: pointer; /* Cambiar el cursor al pasar sobre el botón */
-  transition: background-color 0.3s ease; /* Transición suave para el fondo */
-  font-size: 0.8rem;
-}
-
-.button:hover {
-  background-color: #004494; /* Color más oscuro al pasar el mouse */
+  gap: 15px;
+  margin-top: 5%;
 }
 .error {
   color: red;
-  font-size: 0.9em;
+}
+.profile-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.profile-image {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 10px;
+}
+.button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+.button:hover {
+  background-color: #0056b3;
+}
+.encabezado {
+  position: absolute;
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  gap: 10px;
+}
+.encabezado img {
+  width: 6em;
+  height: 6em;
+  border: 5px solid #4471c4;
+}
+.roles {
+  margin-top: 150px;
+  margin-bottom: 30px;
+}
+.inputs {
+  width: 67%;
+  padding: 2em;
+}
+.radio {
+  height: 5em;
+  width: 30em;
+  font-size: 1em;
+}
+@media (max-width: 950px) {
+  .inputs {
+    width: 100%;
+    padding: 2px;
+  }
+  .radio {
+    width: 25em;
+    height: auto;
+    font-size: 0.9em;
+  }
 }
 
-@media (max-width: 920px) {
-  .container {
-    width: 100%;
-    padding: 5px;
-  }
-  .inputs {
-    padding: 1.5rem 1.5rem 0.5rem;
-  }
-}
-@media (min-width: 1700px) {
-  * {
-    font-size: 1.8rem;
-  }
-  .encabezado {
-    font-size: 1rem;
-  }
-  .button {
-    font-size: 2rem;
-  }
-}
 </style>

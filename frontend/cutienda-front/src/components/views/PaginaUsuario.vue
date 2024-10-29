@@ -76,11 +76,14 @@ export default {
     return {
 
         usuario: {
-            nombre: "Juan",
-            apellidos: "Pérez",
-            correoElectronico: "juan.perez@example.com",
-            telefono: "555-1234",
-            contrasena: "",
+            nombre: "",
+            apellidos: "",
+            correoElectronico: "",
+            telefono: "",
+            contraseña: "",
+            contraseña: "",
+            tipo: "",
+            fotoUrl: "",
         },
       modoEdicion: false,
       tabActiva: "perfil",
@@ -111,6 +114,18 @@ export default {
       this.modoEdicion = false;
       Swal.fire("Guardado con éxito", "Tus cambios han sido guardados", "success");
     },
+    mounted() {
+      // Obtener el objeto del localStorage y parsearlo
+    const usuarioGuardado = JSON.parse(localStorage.getItem("user"));
+    if (usuarioGuardado) {
+      // Asignar el objeto guardado a la propiedad usuario
+      this.usuario = { ...this.usuario, ...usuarioGuardado };
+      // Si tienes una URL de foto de usuario, puedes asignarla también
+      if (usuarioGuardado.fotoUrl) {
+        this.usuarioFoto = usuarioGuardado.fotoUrl;
+      }
+    }
+    }
   },
 };
 </script>

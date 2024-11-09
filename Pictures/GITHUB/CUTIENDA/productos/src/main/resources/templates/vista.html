@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Actualizar Producto</title>
+  <style>
+    body {
+        background-color: #002160;
+        font-family: Arial, sans-serif;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+    .container {
+        text-align: center;
+        width: 80%;
+        max-width: 400px;
+    }
+    .logo2 {
+        width: 100%;
+        padding: 10px;
+        margin-top: 95%;
+    }
+    .product-details {
+        background-color: #0056b3;
+        padding: 15px;
+        border-radius: 10px;
+        margin-top: 10px;
+    }
+    .product-details h3 {
+        margin-top: 0;
+    }
+    .product-image {
+        width: 100%;
+        height: auto;
+        margin-top: 10px;
+        border-radius: 10px;
+    }
+    .button {
+        background-color: #ffa500;
+        color: white;
+        padding: 10px;
+        width: 100%;
+        border: none;
+        margin-top: 10px;
+        cursor: pointer;
+        font-size: 1em;
+        border-radius: 5px;
+    }
+    .delete {
+        background-color: #ffa500;
+        color: white;
+        padding: 10px;
+        width: 100%;
+        border: none;
+        margin-top: 10px;
+        cursor: pointer;
+        font-size: 1em;
+        border-radius: 5px;
+    }
+    .button:hover {
+        background-color: #ff8000;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="image">
+    <img th:src="@{/logo.PNG}" alt="logo2" class="logo2">
+  </div>
+
+  <h1>Actualizar Producto</h1>
+
+  <form th:action="@{/cutienda/actualizarProducto/{id}(id=${producto.id_producto})}" th:object="${producto}" method="POST">
+    <div class="product-details">
+      <h3>Actualizar Detalles del Producto</h3>
+      <label for="nombre_producto">Nombre del Producto</label>
+      <p> </p>
+      <input type="text" id="nombre_producto" th:field="*{nombre_producto}" placeholder="Nombre del producto" />
+      <p> </p>
+      <label for="descripcion">Descripción</label>
+      <p> </p>
+      <textarea id="descripcion" th:field="*{descripcion}" placeholder="Descripción del producto"></textarea>
+      <p> </p>
+      <select name="tipo" class="input-field" th:field="*{tipo}" required multiple>
+        <option value="">Seleccionar Tipo</option>
+        <option value="electronica">Electrónica</option>
+        <option value="ropa">Ropa</option>
+        <option value="hogar">Hogar</option>
+        <option value="juguetes">Juguetes</option>
+        <option value="bebidas">Bebidad</option>
+        <option value="comida">Comida</option>
+        <option value="otro">Otros</option>
+        <!-- Agrega más tipos según sea necesario -->
+      </select>
+      <p> </p>
+      <label for="precio">Precio</label>
+      <p> </p>
+      <input type="number" id="precio" th:field="*{precio}" placeholder="Precio del producto" step="0.01" />
+
+      <p> </p>
+      <!-- Foto del Producto (Solo lectura) -->
+      <div>
+        <img th:src="${producto.fotoBase64}" alt="Imagen del Producto" class="product-image" style="width: 200px; height: 200px;"/>
+      </div>
+
+      <p></p>
+      <br>
+      <a th:href="'https://www.google.com/maps?q=' + ${producto.latitud} + ',' + ${producto.longitud}" target="_blank">
+        <img th:src="@{/map.jpeg}" alt="Map Icon" style="width: 50px; height: 50px;"/>
+      </a>
+
+
+      <button type="submit" class="button">Actualizar Producto</button>
+      <form id="eliminarProductoForm">
+        <button type="button" id="eliminarProductoBtn" class="button" data-id="${producto.id_producto}">
+          Eliminar Producto
+        </button>
+      </form>
+
+
+      <button type="button" onclick="window.location.href='/cutienda/inicio';" class="button">VOLVER</button>
+
+    </div>
+  </form>
+</div>
+<script>
+  document.getElementById("eliminarProductoBtn").addEventListener("click", function() {
+    const productId = this.getAttribute("data-id");
+
+    // Confirmar la eliminación
+    if (confirm("¿Estás seguro de que deseas eliminar este producto?")) {
+      // Realizar la solicitud AJAX con fetch
+      fetch(`/cutienda/eliminarProducto/${producto.id_producto}`, {
+        method: "DELETE",  // Usar DELETE para eliminar el recurso
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      .then(response => {
+        if (response.ok) {
+          alert("Producto eliminado con éxito.");
+          window.location.href = "/cutienda/inicio";  // Redirigir a la página de inicio después de eliminar
+        } else {
+          alert("Error al eliminar el producto.");
+        }
+      })
+      .catch(error => {
+        console.error("Error:", error);
+        alert("Error en la solicitud.");
+      });
+    }
+  });
+</script>
+</body>
+</html>

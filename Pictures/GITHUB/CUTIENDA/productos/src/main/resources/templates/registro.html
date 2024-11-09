@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CUT-TIENDA - Registro de Productos</title>
+    <style>
+        body {
+            background-color: #002160;
+            font-family: Arial, sans-serif;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            margin-top: 0%;
+            text-align: center;
+            width: 80%;
+            max-width: 400px;
+        }
+        .logo2 {
+            width: 100%;
+            padding: 10px;
+            margin-top: 70%;
+        }
+        h1 {
+            font-size: 2em;
+            margin-bottom: 5%;
+        }
+        .input-field, .input-area {
+            background-color: #0056b3;
+            border: none;
+            color: white;
+            padding: 2.5%;
+            margin: 5% 0;
+            width: 95%;
+        }
+        .input-area {
+            height: 100px; /* Ajusta la altura del área de texto */
+            resize: none; /* Evita el redimensionamiento */
+        }
+        .bottom-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5%;
+            margin-bottom: 10%;
+        }
+        .bottom-buttons .button {
+            width: 48%;
+            padding: 2.5%;
+        }
+        .file-input {
+            margin: 5% 0;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+<form class="container" th:action="@{/cutienda/productos/registro}" method="POST" enctype="multipart/form-data">
+    <div class="image">
+        <img th:src="@{/logo.PNG}" alt="logo2" class="logo2">
+    </div>
+    <h3>Registrar Producto</h3>
+
+    <!-- Campo para id_usuario -->
+    <input type="text" id="id_usuario" name="id_usuario" placeholder="id_usuario" class="input-field" required readonly>
+
+    <input type="text" name="nombre_producto" placeholder="Nombre del producto" class="input-field" required>
+    <textarea name="descripcion" placeholder="Descripción" class="input-area" required></textarea>
+
+    <!-- Campo para tipo con múltiples selecciones -->
+    <select name="tipo" class="input-field" required multiple>
+        <option value="">Seleccionar Tipo</option>
+        <option value="electronica">Electrónica</option>
+        <option value="ropa">Ropa</option>
+        <option value="hogar">Hogar</option>
+        <option value="juguetes">Juguetes</option>
+        <option value="bebidas">Bebidad</option>
+        <option value="comida">Comida</option>
+        <option value="otro">Otros</option>
+        <!-- Agrega más tipos según sea necesario -->
+    </select>
+
+    <input type="number" step="0.01" name="precio" placeholder="Precio" class="input-field" required>
+    <input type="file" name="foto" accept="image/*" class="file-input" required />
+    <p> </p>
+    <input type="hidden" id="latitud" name="latitud">
+    <input type="hidden" id="longitud" name="longitud">
+
+    <button type="button" onclick="obtenerUbicacion()">Obtener Ubicación</button>
+    <p id="ubicacion">Ubicación no seleccionada</p>
+    <div class="bottom-buttons">
+        <button type="button" onclick="window.location.href='/cutienda/inicio';" class="button">VOLVER</button>
+        <button type="submit" class="button">REGISTRAR PRODUCTO</button>
+    </div>
+</form>
+
+<script>
+    // Extraer id_usuario de la URL y asignarlo al campo correspondiente
+    document.addEventListener("DOMContentLoaded", function() {
+        const requestURI = window.location.pathname; // Obtener la ruta de la URL
+        const pathParts = requestURI.split("/"); // Separar la ruta por "/"
+        const idUsuario = pathParts[pathParts.length - 1]; // Obtener la última parte de la URL
+        document.getElementById("id_usuario").value = idUsuario; // Asignar el valor al input
+    });
+
+    // Validación del archivo antes de enviar el formulario
+    document.querySelector("form").addEventListener("submit", function(event) {
+        var fileInput = document.querySelector("input[type='file']");
+        var file = fileInput.files[0];
+        if (file) {
+            var fileType = file.type;
+            if (!fileType.startsWith("image/")) {
+                alert("Formato no válido. Por favor, sube una imagen.");
+                event.preventDefault();
+            }
+        } else {
+            alert("Por favor, selecciona un archivo.");
+            event.preventDefault();
+        }
+    });
+
+    function obtenerUbicacion() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                // Asignar latitud y longitud a los campos ocultos
+                document.getElementById("latitud").value = position.coords.latitude;
+                document.getElementById("longitud").value = position.coords.longitude;
+                document.getElementById("ubicacion").textContent = "Ubicación seleccionada";
+            },
+            function(error) {
+                alert("Error al obtener la ubicación: " + error.message);
+            }
+        );
+    } else {
+        alert("La geolocalización no es compatible con este navegador.");
+    }
+}
+</script>
+
+<script th:inline="javascript">
+    let errorMessage = /*[[${error} ?: '']]*/ '';
+    let successMessage = /*[[${mensaje} ?: '']]*/ '';
+
+    if (errorMessage !== '') {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error de registro',
+            text: errorMessage,
+            timer: 3000,
+            showConfirmButton: false
+        });
+    }
+
+    if (successMessage !== '') {
+        Swal.fire({
+            icon: 'success',
+            title: 'Registro exitoso',
+            text: successMessage,
+            timer: 3000,
+            showConfirmButton: false
+        });
+    }
+</script>
+
+</body>
+</html>

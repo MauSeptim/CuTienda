@@ -79,9 +79,8 @@ async function mostrarProductos() {
                         <span id="comentarios-txt-info" class="txt-info">Comentarios</span>
                         <textarea readonly name="coment" class="coment" placeholder="no hay comentarios sobre este vendedor"></textarea>
                     </div>
-                    <div class="nombre-vendedor">
-                        <span>${producto.vendedor}</span>
-                    </div>
+
+                    <button type="button" class="boton" style="width: 100%; font-family: Verdana, Geneva, Tahoma, sans-serif;" onclick="window.location.href='/cutienda/comentarios/${producto.vendedor}';">Califica a ${producto.vendedor}</button>
                     <button type="button" class="boton" style="width: 100%; font-family: Verdana, Geneva, Tahoma, sans-serif;">CONTACTAR VENDEDOR</button>
                 </div>
             </div>
@@ -92,4 +91,3 @@ async function mostrarProductos() {
         contenedor.insertAdjacentHTML('beforeend', productoHTML);
     }
 }
-

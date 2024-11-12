@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vista Cliente - CUT-TIENDA</title>
+  <style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #001848;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+    .container {
+        background-color: #001848;
+        border-radius: 15px;
+        width: 550px;
+        padding: 20px;
+        margin-top: 30px;
+        text-align: center;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    .header {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 40px;
+    }
+    .header img {
+        width: 400px;
+        border-radius: 10%;
+    }
+    .profile-info {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        align-items: center;
+        margin-top: 20px;
+    }
+    .profile-info img {
+        border-radius: 10px;
+        width: 150px;
+        height: 150px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s ease;
+    }
+    .profile-info img:hover {
+        transform: scale(1.05);
+    }
+    .details {
+        text-align: left;
+        color: #fff;
+    }
+    .details label {
+        display: block;
+        font-weight: bold;
+        margin-top: 5px;
+    }
+    .details input {
+        width: 100%;
+        padding: 5px;
+        margin-top: 3px;
+        border-radius: 5px;
+        border: none;
+    }
+    .characteristics {
+        margin-top: 10px;
+    }
+    .characteristics textarea {
+        width: 100%;
+        padding: 10px;
+        border-radius: 5px;
+        border: none;
+    }
+    .rating {
+        margin-top: 15px;
+    }
+    .rating span {
+        font-size: 2em;
+        color: gold;
+    }
+    .buttons {
+        margin-top: 15px;
+    }
+    .buttons button {
+        padding: 10px 20px;
+        margin: 5px;
+        border: none;
+        border-radius: 5px;
+        color: #fff;
+        background-color: #3b5998;
+        cursor: pointer;
+    }
+    .buttons button:hover {
+        background-color: #2d4373;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Header con logo centrado -->
+  <div class="header">
+    <img th:src="@{/images/logo.png}" alt="CUT-TIENDA Logo">
+  </div>
+
+  <div class="subtitle">CUT-TIENDA</div>
+
+  <div class="profile-info">
+    <!-- Foto del vendedor -->
+    <img th:src="@{/capi.jpeg}" alt="Foto del Vendedor">
+
+    <!-- Mapa que abre Google Maps al hacer clic -->
+    <img th:src="@{/map.jpeg}" alt="Ver en Google Maps" class="map-img" onclick="openGoogleMaps()">
+  </div>
+
+  <div class="details">
+    <label>Vendedor:</label>
+    <!-- Comentada para que no genere error -->
+    <input type="text" th:value="${vendedor.nombre}" readonly> -->
+    <input type="text" value="Nombre Vendedor" readonly>
+    <label>Número:</label>
+    <!-- Comentada para que no genere error -->
+    <!-- <input type="text" th:value="${vendedor.telefono}" readonly> -->
+    <input type="text" value="123456789" readonly>
+    <label>Correo electrónico:</label>
+    <!-- Comentada para que no genere error -->
+    <!-- <input type="text" th:value="${vendedor.correo_electronico}" readonly> -->
+    <input type="text" value="vendedor@correo.com" readonly>
+  </div>
+
+  <div class="characteristics">
+    <label>Comentarios:</label>
+    <!-- Comentada para que no genere error -->
+    <!-- <div th:each="comentario : ${comentarios}"> -->
+    <textarea rows="3" readonly>Comentario de ejemplo</textarea>
+    <!-- </div> -->
+  </div>
+
+  <div class="rating">
+    <!-- Comentada para que no genere error -->
+    <!-- <span th:each="comentario : ${comentarios}"> -->
+    <!-- <span th:each="starStat : ${#numbers.sequence(1, comentario.calificacion)}">⭐</span> -->
+    <!-- </span> -->
+    <span>⭐⭐⭐⭐⭐</span>
+  </div>
+
+  <div class="buttons">
+    <button>Calificar vendedor</button>
+    <button>Ver productos</button>
+  </div>
+</div>
+
+<script>
+  function openGoogleMaps() {
+      if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition((position) => {
+              const latitude = position.coords.latitude;
+              const longitude = position.coords.longitude;
+              window.open(`https://www.google.com/maps?q=${latitude},${longitude}`, '_blank');
+          }, () => {
+              alert("No se pudo obtener tu ubicación.");
+          });
+      } else {
+          alert("La geolocalización no está soportada por tu navegador.");
+      }
+  }
+</script>
+
+</body>
+</html>

@@ -60,6 +60,8 @@ public class ProductoApi {
         }).toList();
     }
 
+
+
     @GetMapping("/producto/{nombre}/nombre")
     public List<ProductoDTO> obtenerPorNombre(@PathVariable String nombre) {
         return productoService.obtenerPorNombreCoincidente(nombre).
@@ -117,5 +119,7 @@ public class ProductoApi {
                 .contentType(MediaType.parseMediaType(producto.getContentType())) // O el tipo adecuado según el archivo
                 .body(producto.getFoto());
     }
+
+
 
 }

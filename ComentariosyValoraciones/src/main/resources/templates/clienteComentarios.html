@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calificación del Vendedor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #002366;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #1A4A99;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            width: 350px;
+        }
+
+        .header img {
+            width: 300px;
+        }
+
+        .header h1, .header h2 {
+            margin: 10px 0;
+        }
+
+        .rating-section {
+            background-color: #4677C4;
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .profile-section {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .rating-section p {
+            margin-bottom: 10px;
+        }
+
+        input[type="text"], input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border: none;
+            text-align: center;
+        }
+
+        textarea {
+            width: 100%;
+            height: 60px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border: none;
+            padding: 10px;
+        }
+
+        .stars {
+            margin: 10px 0;
+        }
+
+        .stars span {
+            font-size: 30px;
+            color: gold;
+            cursor: pointer;
+        }
+
+        button {
+            background-color: #0047AB;
+            color: white;
+            padding: 10px 20px;
+            margin: 10px 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .profile-section img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: contain;
+            margin-bottom: 20px;
+        }
+
+        button:hover {
+            background-color: #003385;
+        }
+    </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+    const urlParts = window.location.pathname.split('/');
+    const usuarioId = urlParts[urlParts.length - 2];
+    const vendedorId = urlParts[urlParts.length - 1];
+
+    document.querySelector('input[name="usuario"]').value = usuarioId;
+    document.querySelector('input[name="vendedor"]').value = vendedorId;
+
+    const stars = document.querySelectorAll('.stars span');
+    const hiddenInput = document.querySelector('input[name="calificacion"]');
+
+    stars.forEach(star => {
+        star.addEventListener('click', function() {
+            hiddenInput.value = this.getAttribute('data-value');
+
+            stars.forEach(s => s.style.color = 'gold');
+            for (let i = 0; i < this.getAttribute('data-value'); i++) {
+                stars[i].style.color = 'gold';
+            }
+            for (let i = this.getAttribute('data-value'); i < stars.length; i++) {
+                stars[i].style.color = 'lightgray';
+            }
+        });
+    });
+
+    // Agregar evento al enviar el formulario
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(event) {
+        const fotoUrl = document.getElementById('fotoUrl').src;
+        const fotoBlob = fotoUrl.split(',')[1]; // Extraer la parte base64
+        const byteCharacters = atob(fotoBlob); // Decodificar base64
+        const byteNumbers = new Uint8Array(byteCharacters.length);
+
+        for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+
+        const blob = new Blob([byteNumbers], { type: 'image/png' }); // Cambia el tipo si es necesario
+        const blobUrl = URL.createObjectURL(blob); // Crear URL del blob
+
+        const hiddenInput = document.getElementById('fotoBlob');
+        hiddenInput.value = blobUrl; // Guardar el URL del blob en el campo oculto
+    });
+});
+
+    </script>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <img src="/logo.png" alt="Logo" class="logo">
+        <h2>Vista Cliente</h2>
+        <p>Calificar al vendedor</p>
+    </div>
+    <div class="rating-section">
+        <form action="/cutienda/comentarios/guardar" method="post" enctype="multipart/form-data"> <!-- Modificado para incluir enctype -->
+            <input type="hidden" name="usuario">
+            <input type="hidden" name="vendedor">
+            <p>Vendedor:</p>
+            <div class="profile-section">
+                <img th:src="${usuario.fotoUrlBase64}" alt="Imagen de Perfil" class="profile-image" id="fotoUrl">
+                <input type="hidden" name="foto" id="fotoBlob"> <!-- Campo oculto para enviar la imagen -->
+            </div>
+
+            <p>Comentarios:</p>
+            <textarea name="contenido" placeholder="Escribe tus comentarios aquí..." required></textarea> <!-- Cambiado el nombre a "contenido" -->
+            <div class="stars">
+                <span data-value="1">★</span>
+                <span data-value="2">★</span>
+                <span data-value="3">★</span>
+                <span data-value="4">★</span>
+                <span data-value="5">★</span>
+            </div>
+            <input type="hidden" name="calificacion" value="">
+            <button type="submit">Enviar calificación</button>
+            <button type="button" onclick="window.location.href='/cutienda/inicio'">Inicio</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>

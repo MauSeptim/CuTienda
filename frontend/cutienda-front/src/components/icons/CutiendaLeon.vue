@@ -5,6 +5,6 @@
 <style>
 .leonimg {
     border-radius: 100%;
-    border: 2.5vh #4471c4 solid;
+    border: 6px #4471c4 solid;
 }
 </style>

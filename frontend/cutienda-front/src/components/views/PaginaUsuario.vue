@@ -143,7 +143,7 @@ body {
 }
 .encabezado {
   background-color: #001f5f;
-  height: 5rem;
+  height: auto; 
   position: relative;
   width: 100%;
   display: flex;
@@ -152,9 +152,8 @@ body {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 .encabezado img {
-  width: 5rem;
-  height: 5rem;
-  border: 0.5rem solid #4472c4;
+  width: 7rem;
+  height: 7rem;
   transform: translateY(-30px);
 }
 .container {

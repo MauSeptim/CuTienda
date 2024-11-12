@@ -63,7 +63,10 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center
+  justify-content: center;
+}
+.iter-cuadro {
+  margin-top: 60px;
 }
 
 .navbar-imagen {
@@ -73,8 +76,8 @@ body {
   align-items: center;
 }
 .navbar-imagen img {
-  width: 20vw;
-  height: 41vh;
+  width: 12rem;
+  height: 12rem;
 }
 .navbar-imagen h1 {
   margin-top: 5vh;
@@ -98,7 +101,4 @@ body {
 
 }
 
-.iter-cuadro {
-  margin-bottom: -38vh;
-}
 </style>

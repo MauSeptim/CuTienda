@@ -117,7 +117,7 @@
           </div>
 
           <div class="bottom-buttons">
-            <button type="submit" class="button">CREAR CUENTA</button>
+            <button type="submit" class="button">INICIA SESION</button>
           </div>
         </form>
       </div>

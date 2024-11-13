@@ -12,7 +12,7 @@
           v-model="formData.role"
           name="roles"
           :options="[
-            { id: 'admin', value: 'admin', label: 'ADMINISTRADOR' },
+            { id: 'admin', value: 'admin', label: 'ADMIN' },
             { id: 'client', value: 'client', label: 'CLIENTE' }
           ]"
         />
@@ -117,7 +117,8 @@
           </div>
 
           <div class="bottom-buttons">
-            <button type="submit" class="button">INICIA SESION</button>
+            <button type="submit" class="button">CREAR CUENTA</button>
+            <button class="button" @click="login">INICIAR SESION</button>
           </div>
         </form>
       </div>
@@ -154,6 +155,9 @@ export default {
     };
   },
   methods: {
+    login() {
+      this.$router.push('Login');
+    },
     validateField(field) {
       // Limpia los errores anteriores
       this.errors[field] = '';

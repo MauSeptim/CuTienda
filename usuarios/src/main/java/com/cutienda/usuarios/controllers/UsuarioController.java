@@ -78,9 +78,9 @@ public class UsuarioController {
     // Endpoint para iniciar sesión
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> iniciarSesion(
-            @RequestParam("correoElectronico") String correoElectronico,
-            @RequestParam("contraseña") String contraseña,
-            @RequestParam("selectedRole") String selectedRole) {
+            @RequestParam("email") String correoElectronico,
+            @RequestParam("password") String contraseña,
+            @RequestParam("role") String selectedRole) {
 
         Map<String, Object> response = new HashMap<>();
         try {

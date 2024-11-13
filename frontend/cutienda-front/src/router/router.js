@@ -4,6 +4,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import PaginaCrearCuenta from '@/components/views/PaginaCrearCuenta.vue' 
 import PaginaProductos from '@/components/views/PaginaProductos.vue'
 import PaginaUsuario from '@/components/views/PaginaUsuario.vue'
+import Login from '@/components/views/Login.vue'
 
 const routes = [
   {
@@ -20,6 +21,11 @@ const routes = [
     path: '/usuario',
     name: 'Usuario',
     component: PaginaUsuario
+  },
+  {
+    path: '/login',
+    name: 'Login',
+    component: Login
   }
   // Puedes añadir más rutas aquí
 ]

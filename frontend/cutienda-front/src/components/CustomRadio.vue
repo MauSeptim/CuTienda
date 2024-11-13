@@ -53,6 +53,8 @@ export default {
 <style scoped>
 .custom-radio-group {
   display: flex;
+  justify-content: center;
+  align-items: center;
   gap: 1.5rem;
 }
 
@@ -60,6 +62,7 @@ export default {
   position: relative;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.8em;
   cursor: pointer;
   transition: transform 0.3s ease, box-shadow 0.3s ease;

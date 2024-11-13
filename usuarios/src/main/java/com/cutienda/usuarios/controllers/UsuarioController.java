@@ -25,7 +25,7 @@ import java.util.Map;
 
 
 @Controller
-@CrossOrigin(origins = "http://localhost:8076")
+@CrossOrigin(origins = "*")
 @RequestMapping("/cutienda")
 public class UsuarioController {
 

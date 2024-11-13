@@ -3,10 +3,9 @@ package com.cutienda.productos.Controller;
 import com.cutienda.productos.Modelos.ProductoModelo;
 import com.cutienda.productos.Services.ProductoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,43 +13,51 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 
-@Controller
-@RequestMapping("/cutienda")
+@RestController
+@CrossOrigin(origins = "*")
+@RequestMapping("cutienda/api/productos")  // Cambiamos la ruta base para reflejar el estilo REST
 public class ProductoController {
 
     @Autowired
     private ProductoService productoService;
 
-    // Ruta para mostrar el formulario de registro
-    @GetMapping("/registroprod/{iduser}")
-    public String mostrarRegistro() {
-        return "registro";  // Asegúrate de tener un archivo HTML llamado 'registro.html'
+    // Conseguir todos los productos
+    @GetMapping
+    public ResponseEntity<List<ProductoModelo>> conseguirTodos() {
+        List<ProductoModelo> productos = productoService.obtenerTodosProductos();
+        return new ResponseEntity<>(productos, HttpStatus.OK);
     }
 
-    @GetMapping("/registroprod/{iduser}/{id_producto}")
-    public String mostrarProducto(@PathVariable Long id_producto, Model model) {
-        ProductoModelo producto = productoService.obtenerProductoPorId(id_producto);
+    // Conseguir un producto por su ID
+    @GetMapping("/{id}")
+    public ResponseEntity<ProductoModelo> conseguirProductoPorId(@PathVariable Long id) {
+        ProductoModelo producto = productoService.obtenerProductoPorId(id);
         if (producto == null) {
-            model.addAttribute("error", "Producto no encontrado");
-            return "error"; // Redirige a una página de error si no se encuentra el producto
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        model.addAttribute("producto", producto);
-        return "vista"; // Nombre de la plantilla Thymeleaf
+        return new ResponseEntity<>(producto, HttpStatus.OK);
     }
 
-    @PostMapping("/productos/registro")
-    public String registrarProducto(@RequestParam("nombre_producto") String nombre,
-                                    @RequestParam("id_usuario") int id_usuario,
-                                    @RequestParam("descripcion") String descripcion,
-                                    @RequestParam("tipo") String tipo,
-                                    @RequestParam("precio") BigDecimal precio,
-                                    @RequestParam(value = "latitud", required = false) Double latitud,
-                                    @RequestParam(value = "longitud", required = false) Double longitud,
-                                    @RequestParam(value = "foto", required = false) MultipartFile foto,
-                                    Model model) {
+    @GetMapping("/buscar")
+    public ResponseEntity<List<ProductoModelo>> buscarProductosPorNombre(@RequestParam String nombre) {
+        List<ProductoModelo> productos = productoService.buscarProductosPorNombre(nombre);
+        return new ResponseEntity<>(productos, HttpStatus.OK);
+    }
+
+    // Registrar un nuevo producto
+    @PostMapping("/registro")
+    public ResponseEntity<String> registrarProducto(
+            @RequestParam("nombre_producto") String nombre,
+            @RequestParam("id_usuario") int id_usuario,
+            @RequestParam("descripcion") String descripcion,
+            @RequestParam("tipo") String tipo,
+            @RequestParam("precio") BigDecimal precio,
+            @RequestParam(value = "latitud", required = false) Double latitud,
+            @RequestParam(value = "longitud", required = false) Double longitud,
+            @RequestParam(value = "foto", required = false) MultipartFile foto) {
         try {
             ProductoModelo producto = new ProductoModelo();
-            producto.setNombre_producto(nombre);
+            producto.setNombreProducto(nombre);
             producto.setDescripcion(descripcion);
             producto.setTipo(tipo);
             producto.setPrecio(precio);
@@ -69,41 +76,48 @@ public class ProductoController {
             }
 
             productoService.guardarProducto(producto);
-            model.addAttribute("mensaje", "Producto registrado exitosamente");
-            return "redirect:/cutienda/inicio";
+            return ResponseEntity.status(HttpStatus.CREATED).body("Producto registrado exitosamente.");
         } catch (IOException e) {
-            model.addAttribute("error", "Error al registrar el producto: " + e.getMessage());
-            return "producto/registro";
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al registrar el producto: " + e.getMessage());
         }
     }
 
-    @PostMapping("/actualizarProducto/{id}")
-    public String actualizarProducto(@PathVariable Long id, @ModelAttribute ProductoModelo producto) {
-        // Asegúrate de que el ID no sea nulo
-        if (id == null) {
-            throw new IllegalArgumentException("El ID del producto no puede ser nulo");
+    // Actualizar un producto existente
+    @PutMapping("/{id}")
+    public ResponseEntity<String> actualizarProducto(@PathVariable Long id, @RequestBody ProductoModelo producto) {
+        if (productoService.obtenerProductoPorId(id) == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Producto no encontrado");
         }
-        // Aquí asignamos el ID del producto
         producto.setId_producto(id);
         productoService.actualizarProducto(producto);
-        return "redirect:/cutienda/registroprod/" + producto.getId_usuario() + "/" + producto.getId_producto();
+        return ResponseEntity.ok("Producto actualizado exitosamente.");
     }
 
-    // Método para eliminar un producto
-    @DeleteMapping("/eliminarProducto/{id}")
+    // Eliminar un producto por ID
+    @DeleteMapping("/{id}")
     public ResponseEntity<String> eliminarProducto(@PathVariable Long id) {
         try {
-            productoService.eliminarProducto(id);  // Elimina el producto
+            productoService.eliminarProducto(id);
             return ResponseEntity.ok("Producto eliminado con éxito.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error al eliminar el producto: " + e.getMessage());
         }
     }
-
-
-
-
+    // Servir la foto de un producto por ID
+    @GetMapping("/foto/{id}")
+    public ResponseEntity<byte[]> obtenerFotoProducto(@PathVariable Long id) {
+        ProductoModelo producto = productoService.obtenerProductoPorId(id);
+        if (producto != null && producto.getFoto() != null) {
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_TYPE, "image/jpeg")  // O el tipo de imagen correcto
+                    .body(producto.getFoto());
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
 
 }
+
 

@@ -8,18 +8,22 @@ const props = defineProps({
         required: true
     }
 });
-
+var producto = ref(props.producto);
 var foto = ref(null);
 
-let fetchFoto = async () => {
-    try {
-        const response = await axios.get(props.producto.foto, {
-            responseType: 'blob'
+let fetchFoto = () => {
+    // Verificar que el ID del producto está definido antes de hacer la solicitud
+    if (producto.value && producto.value.id_producto) {
+        axios.get(`http://localhost:8010/cutienda/api/productos/foto/${producto.value.id_producto}`, { responseType: 'arraybuffer' })
+        .then((response) => {
+            // Convertir los datos binarios en base64 para que pueda mostrarse en la imagen
+            const base64Image = btoa(String.fromCharCode(...new Uint8Array(response.data)));
+            producto.value.foto = `data:image/jpeg;base64,${base64Image}`;
+        }).catch((error) => {
+            console.error("Error al obtener la foto:", error);
         });
-        foto.value = URL.createObjectURL(response.data); 
-        console.log(foto.value)
-    } catch(error) {
-        alert('Error obteniendo la foto')
+    } else {
+        console.error("El ID del producto no está definido.");
     }
 };
 
@@ -39,10 +43,10 @@ onMounted(fetchFoto);
 		</div>
 		<div class="table-content">	
 			<div class="table-row">		
-				<div class="table-data"><img class="foto" :src="foto" alt=""></div>
-				<div class="table-data">{{ producto.nombre }}</div>
+				<div class="table-data"><img class="foto" :src="producto.foto" alt=""></div>
+				<div class="table-data">{{ producto.nombreProducto }}</div>
 				<div class="table-data">{{ producto.precio }}</div>
-				<div class="table-data">{{ producto.vendedor }}</div>
+				<div class="table-data">{{ producto.id_usuario }}</div>
 				<div class="table-data">{{producto.descripcion}}</div>
 			</div>
 		</div>	
@@ -65,6 +69,11 @@ onMounted(fetchFoto);
     
     --color-alpha: #1772FF;
     --color-form-highlight: #001a52;
+}
+
+.foto {
+    width: 12rem;
+    height: 12rem;
 }
 
 *, *:before, *:after {

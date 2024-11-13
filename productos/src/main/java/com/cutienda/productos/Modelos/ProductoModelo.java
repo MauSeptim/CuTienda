@@ -15,7 +15,7 @@ public class ProductoModelo {
     private Long id_producto;
 
     private int id_usuario;
-    private String nombre_producto;
+    private String nombreProducto;
     private String descripcion;
     private String tipo;
 
@@ -32,10 +32,10 @@ public class ProductoModelo {
     // Constructores
     public ProductoModelo() {}
 
-    public ProductoModelo(Long id_producto, int id_usuario, String nombre_producto, String descripcion, String tipo, BigDecimal precio, byte[] foto, Double latitud, Double longitud) {
+    public ProductoModelo(Long id_producto, int id_usuario, String nombreProducto, String descripcion, String tipo, BigDecimal precio, byte[] foto, Double latitud, Double longitud) {
         this.id_producto = id_producto;
         this.id_usuario = id_usuario;
-        this.nombre_producto = nombre_producto;
+        this.nombreProducto = nombreProducto;
         this.descripcion = descripcion;
         this.tipo = tipo;
         this.precio = precio;
@@ -61,12 +61,12 @@ public class ProductoModelo {
         this.id_usuario = id_usuario;
     }
 
-    public String getNombre_producto() {
-        return nombre_producto;
+    public String getNombreProducto() {
+        return nombreProducto;
     }
 
-    public void setNombre_producto(String nombre_producto) {
-        this.nombre_producto = nombre_producto;
+    public void setNombreProducto(String nombreProducto) {
+        this.nombreProducto = nombreProducto;
     }
 
     public String getDescripcion() {

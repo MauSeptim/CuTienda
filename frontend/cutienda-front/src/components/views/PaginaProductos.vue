@@ -13,7 +13,12 @@ const router = useRouter()
 // Función para buscar productos en la API
 const buscarProductos = async (query) => {
   try {
-    const response = await axios.get(`http://localhost:8076/cutienda/producto/${query}/nombre`);
+    const url = query 
+      ? `http://localhost:8010/cutienda/api/productos/buscar?nombre=${query}` 
+      : 'http://localhost:8010/cutienda/api/productos';  // Si no hay query, obtienes todos los productos
+
+    const response = await axios.get(url);
+
     productos.value = response.data;  // Actualiza la lista de productos
   } catch (error) {
     alert('No se pudo obtener todos los productos');
@@ -28,7 +33,7 @@ const aPerfil = () => {
 </script>
 
 <template>
-    
+  <div>
     <nav class="navbar-imagen">
       <CutiendaLeon/>
       <h1>CuTienda</h1>
@@ -47,6 +52,7 @@ const aPerfil = () => {
                       :producto="producto"
                       class="iter-cuadro"/>
     </div>  
+  </div>
 </template>
 
 <style >

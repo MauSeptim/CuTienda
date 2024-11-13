@@ -30,7 +30,7 @@ async function mostrarProductos() {
     await buscarProductos();
     const contenedor = document.getElementById('productos');
     contenedor.innerHTML = '';
-    console.log(resultados)
+    console.log(resultados);
 
     // Calcular el índice inicial y final
     const inicio = paginaActual * productosPorPagina;
@@ -39,8 +39,6 @@ async function mostrarProductos() {
 
     // Iterar sobre los productos y cargar sus imágenes
     for (const producto of productosPagina) {
-        // Obtener la foto del producto
-        console.log(producto)
         let imagenSrc;
 
         try {
@@ -66,9 +64,16 @@ async function mostrarProductos() {
                     <table class="tabla">
                         <tbody>
                             <tr>
+                                <p></p>
                                 <td class="txt-info">Nombre: </td>
                                 <td><span class="txt-resp">${producto.nombre}</span></td>
                             </tr>
+                            <tr>
+                                <p></p>
+                                <td class="txt-info">Tipo: </td>
+                                <td><span class="txt-resp">${producto.tipo}</span></td>
+                            </tr>
+
                             <tr>
                                 <td class="txt-info">Precio: </td>
                                 <td><span class="txt-resp">${producto.precio}$</span></td>
@@ -76,18 +81,19 @@ async function mostrarProductos() {
                         </tbody>
                     </table>
                     <div class="caja-comentario">
-                        <span id="comentarios-txt-info" class="txt-info">Comentarios</span>
-                        <textarea readonly name="coment" class="coment" placeholder="no hay comentarios sobre este vendedor"></textarea>
+                        <span id="comentarios-txt-info" class="txt-info">Descripción</span>
+                        <textarea readonly name="coment" class="coment" placeholder="${producto.descripcion}$"></textarea>
                     </div>
 
-                    <button type="button" class="boton" style="width: 100%; font-family: Verdana, Geneva, Tahoma, sans-serif;" onclick="window.location.href='/cutienda/comentarios/${producto.vendedor}';">Califica a ${producto.vendedor}</button>
+                    <button type="button" class="boton" style="width: 100%; font-family: Verdana, Geneva, Tahoma, sans-serif;" onclick="window.location.href='/cutienda/comentarios/${producto.vendedor}';">Califica al Vendedor</button>
                     <button type="button" class="boton" style="width: 100%; font-family: Verdana, Geneva, Tahoma, sans-serif;">CONTACTAR VENDEDOR</button>
                 </div>
             </div>
         `;
 
-        resultados = [];
         // Insertar el HTML en el contenedor
         contenedor.insertAdjacentHTML('beforeend', productoHTML);
     }
+
+
 }

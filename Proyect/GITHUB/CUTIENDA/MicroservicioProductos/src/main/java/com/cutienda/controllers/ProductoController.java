@@ -31,10 +31,10 @@ public class ProductoController {
         return "redirect:" + "http://localhost:8083/cutienda/notificaciones";
     }
 
-    @GetMapping("/cutienda/comentarios/{vendedor}")
-    public String Nombre(@PathVariable String vendedor){
+    @GetMapping("/cutienda/comentarios/{idUsuario}")
+    public String Nombre(@PathVariable String idUsuario){
 
-        return "redirect:" + "http://localhost:8081/cutienda/comentarios/" + vendedor;
+        return "redirect:" + "http://localhost:8081/cutienda/comentarios/" + idUsuario;
 
 
     }

@@ -3,6 +3,9 @@ package com.cutienda.vendedor.Controller;
 
 import com.cutienda.vendedor.Modelos.Comentario;
 import com.cutienda.vendedor.Modelos.Usuario;
+import com.cutienda.vendedor.Modelos.producto;
+import com.cutienda.vendedor.Services.ComentarioService;
+import com.cutienda.vendedor.Services.ProductoService;
 import com.cutienda.vendedor.Services.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -17,25 +20,50 @@ import java.util.List;
 @RequestMapping("/cutienda")
 public class VendedorController {
 
-    @GetMapping("/vendedor/{idvendedor}/{idproducto}")
-    public String mostrarNotificacion() {
 
-        return "vendedor";
-    }
 
     @Autowired
     private UsuarioService usuarioService;
+    @Autowired
+    private ComentarioService comentarioService;
+    @Autowired
+    private ProductoService productoService;
 
-    @GetMapping("/vendedor/{id}")
-    public String verVendedor(@PathVariable Long id, Model model) {
-        Usuario vendedor = usuarioService.obtenerVendedor(id);
-        List<Comentario> comentario = usuarioService.obtenerComentariosPorVendedor(id);
+    @GetMapping("/vendedor/{idvendedor}/{id_producto}")
+    public String getVendedor(@PathVariable Long idvendedor, @PathVariable Long id_producto, Model model) {
+        // Obtener información del vendedor
+        System.out.println("ID Producto recibido: " + id_producto);
+        Usuario vendedor = usuarioService.obtenerVendedor(idvendedor);
+        List<Comentario> comentarios = comentarioService.obtenerComentariosPorVendedor(idvendedor);
 
+        // Obtener el producto y verificar las coordenadas
+        producto prod = productoService.obtenerProductoPorId(id_producto);
+        if (prod != null) {
+            System.out.println("Coordenadas del producto: Latitud: " + prod.getLatitud() + ", Longitud: " + prod.getLongitud());
+        } else {
+            System.out.println("Producto no encontrado");
+        }
+
+        // Calcular el promedio de las calificaciones
+        double promedioCalificacion = comentarios.stream()
+                .mapToInt(Comentario::getCalificacion)
+                .average()
+                .orElse(0.0);  // Si no hay comentarios, el promedio será 0
+
+        // Pasar los datos al modelo
+        model.addAttribute("producto", prod);
         model.addAttribute("vendedor", vendedor);
-        model.addAttribute("comentario", comentario);
+        model.addAttribute("comentarios", comentarios);
+        model.addAttribute("promedioCalificacion", promedioCalificacion);
 
-        return "vendedor";  // Nombre del archivo HTML
+        return "vendedor";  // Asegúrate de que la vista sea la correcta
     }
+
+
+
+
+
+
 
 
 }

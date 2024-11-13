@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Base64;
 import java.util.List;
 
 @RestController
@@ -25,8 +24,9 @@ public class ProductoApi {
     public String bienvenido() {
         return "<h1>Bienvenidos</h1><br/><p>a la api <strong>Productos</strong></p>";
     }
+
     @GetMapping("/producto/{id}/id")
-    public ResponseEntity<ProductoDTO> obtenerProducto(@PathVariable String id) {
+    public ResponseEntity<ProductoDTO> obtenerProducto(@PathVariable Long id) {
         Producto producto = productoService.conseguirPorId(id);
         if (producto == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -34,12 +34,13 @@ public class ProductoApi {
 
         // Crear DTO para la respuesta
         ProductoDTO productoDTO = new ProductoDTO(
-                producto.getId(),
-                producto.getNombre(),
-                producto.getVendedor(),
+                producto.getIdProducto(),
+                producto.getNombreProducto(),
+                producto.getIdUsuario(),
                 producto.getDescripcion(),
-                "http://localhost:8076/cutienda/producto/" + producto.getId() + "/foto",  // URL para la imagen
-                producto.getPrecio()
+                "http://localhost:8076/cutienda/producto/" + producto.getIdProducto() + "/foto",  // URL para la imagen
+                producto.getPrecio(),
+                producto.getTipo()
         );
 
         return ResponseEntity.ok(productoDTO);
@@ -49,41 +50,43 @@ public class ProductoApi {
     public List<ProductoDTO> todosLosProductos() {
         List<Producto> productos = productoService.conseguirTodos();
         return productos.stream().map(producto -> {
-                    return new ProductoDTO(
-                    producto.getId(),
-                    producto.getNombre(),
-                    producto.getVendedor(),
+            return new ProductoDTO(
+                    producto.getIdProducto(),
+                    producto.getNombreProducto(),
+                    producto.getIdUsuario(),
                     producto.getDescripcion(),
-                    "http://localhost:8076/cutienda/producto/" + producto.getId() + "/foto",  // URL para la imagen
-                    producto.getPrecio()
+                    "http://localhost:8076/cutienda/producto/" + producto.getIdProducto() + "/foto",  // URL para la imagen
+                    producto.getPrecio(),
+                    producto.getTipo()
             );
         }).toList();
     }
 
-
-
-    @GetMapping("/producto/{nombre}/nombre")
-    public List<ProductoDTO> obtenerPorNombre(@PathVariable String nombre) {
-        return productoService.obtenerPorNombreCoincidente(nombre).
-                stream().
-                map(p -> {
-                   return new ProductoDTO(
-                            p.getId(),
-                            p.getNombre(),
-                            p.getVendedor(),
+    @GetMapping("/producto/{nombreProducto}/nombre")
+    public List<ProductoDTO> obtenerPorNombre(@PathVariable String nombreProducto) {
+        return productoService.obtenerPorNombreCoincidente(nombreProducto)
+                .stream()
+                .map(p -> {
+                    return new ProductoDTO(
+                            p.getIdProducto(),
+                            p.getNombreProducto(),
+                            p.getIdUsuario(),
                             p.getDescripcion(),
-                           "http://localhost:8076/cutienda/producto/" + p.getId() + "/foto",  // URL para la imagen
-                            p.getPrecio()
+                            "http://localhost:8076/cutienda/producto/" + p.getIdProducto() + "/foto",  // URL para la imagen
+                            p.getPrecio(),
+                            p.getTipo()
                     );
                 }).toList();
     }
 
+
     @PostMapping("/producto/guardar")
     public ResponseEntity<Producto> guardarProducto(
-            @RequestParam("nombre") String nombre,
-            @RequestParam("vendedor") String vendedor,
+            @RequestParam("nombreProducto") String nombre,
+            @RequestParam("idUsuario") String idUsuario,
             @RequestParam("descripcion") String descripcion,
             @RequestParam("precio") double precio,
+            @RequestParam("tipo") String tipo,
             @RequestParam("foto") MultipartFile foto) {
 
         try {
@@ -92,14 +95,14 @@ public class ProductoApi {
             String contentType = foto.getContentType(); // Obtener el tipo de contenido
 
             // Crear un nuevo producto y establecer la imagen
-            Producto producto =  Producto.builder().
-                    descripcion(descripcion).
-                    nombre(nombre).
-                    contentType(contentType).
-                    vendedor(vendedor).
-                    precio(precio).
-                    foto(imagenBytes).
-                    build();
+            Producto producto = Producto.builder()
+                    .descripcion(descripcion)
+                    .nombre(nombre)
+                    .tipo(contentType)
+                    .idUsuario(idUsuario)
+                    .precio(precio)
+                    .foto(imagenBytes)
+                    .build();
 
             productoService.guardar(producto);
             return ResponseEntity.status(HttpStatus.CREATED).body(producto);
@@ -107,19 +110,24 @@ public class ProductoApi {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-    @GetMapping(value = "/producto/{id}/foto", produces = MediaType.ALL_VALUE)
-    public ResponseEntity<byte[]> obtenerFoto(@PathVariable String id) {
-        Producto producto = productoService.conseguirPorId(id);
+
+    @GetMapping(value = "/producto/{idProducto}/foto", produces = MediaType.ALL_VALUE)
+    public ResponseEntity<byte[]> obtenerFoto(@PathVariable Long idProducto) {
+        Producto producto = productoService.conseguirPorId(idProducto);
         if (producto == null || producto.getFoto() == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
+        // Establecer un tipo MIME predeterminado si el tipo es inválido
+        String tipo = producto.getTipo();
+        if (tipo == null || !tipo.contains("/")) {
+            tipo = "image/jpeg";  // Asignar un tipo MIME predeterminado
+        }
+
         // Devuelve la imagen como respuesta
         return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(producto.getContentType())) // O el tipo adecuado según el archivo
+                .contentType(MediaType.parseMediaType(tipo)) // O el tipo adecuado según el archivo
                 .body(producto.getFoto());
     }
-
-
 
 }

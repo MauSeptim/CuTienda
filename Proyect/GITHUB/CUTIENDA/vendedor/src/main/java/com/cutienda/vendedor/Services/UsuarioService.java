@@ -15,19 +15,7 @@ public class UsuarioService {
     @Autowired
     private UsuarioRepositorio usuarioRepository;
 
-    @Autowired
-    private ComentarioRepositorio comentarioRepository;
-
-    public Usuario obtenerVendedor(Long id_vendedor) {
-        return usuarioRepository.findById(id_vendedor).orElse(null);
-    }
-
-    public List<Comentario> obtenerComentariosPorVendedor(Long id_vendedor) {
-        return comentarioRepository.findByIdVendedor(id_vendedor);
-    }
-
-    public double calcularPuntuacionPromedio(Long id_vendedor) {
-        List<Comentario> comentarios = comentarioRepository.findByIdVendedor(id_vendedor);
-        return comentarios.stream().mapToInt(Comentario::getCalificacion).average().orElse(0.0);
+    public Usuario obtenerVendedor(Long id) {
+        return usuarioRepository.findById(id).orElse(null);
     }
 }

@@ -1,8 +1,6 @@
 package com.cutienda.services;
 
 import com.cutienda.models.Producto;
-import com.cutienda.repositories.EtiquetaRepository;
-import com.cutienda.repositories.ProductoEtiquetaRepository;
 import com.cutienda.repositories.ProductoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,30 +9,25 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class ProductoServiceImpl implements ProductoService{
+public class ProductoServiceImpl implements ProductoService {
     @Autowired
-    ProductoRepository productoRepository;
-    @Autowired
-    EtiquetaRepository etiquetaRepository;
-    @Autowired
-    ProductoEtiquetaRepository productoEtiquetaRepository;
+    private ProductoRepository productoRepository;
 
-    public ProductoServiceImpl(ProductoRepository productoRepository, EtiquetaRepository etiquetaRepository, ProductoEtiquetaRepository productoEtiquetaRepository) {
+    public ProductoServiceImpl(ProductoRepository productoRepository) {
         this.productoRepository = productoRepository;
-        this.etiquetaRepository = etiquetaRepository;
-        this.productoEtiquetaRepository = productoEtiquetaRepository;
     }
 
     @Override
     public Producto guardar(Producto producto) {
-        if (producto != null)
+        if (producto != null) {
             return productoRepository.save(producto);
-        else
+        } else {
             return null;
+        }
     }
 
     @Override
-    public Producto eliminarPorId(String id) {
+    public Producto eliminarPorId(Long id) {  // Cambiar de String a Long
         Producto eliminado = conseguirPorId(id);
 
         if (eliminado != null) {
@@ -44,9 +37,8 @@ public class ProductoServiceImpl implements ProductoService{
     }
 
     @Override
-    public Producto conseguirPorId(String id) {
+    public Producto conseguirPorId(Long id) {  // Cambiar de String a Long
         Optional<Producto> opc = productoRepository.findById(id);
-
         return opc.orElse(null);
     }
 
@@ -56,26 +48,14 @@ public class ProductoServiceImpl implements ProductoService{
     }
 
     @Override
-    public void actualizarPorId(String id, Producto p) {
-        Producto prod = conseguirPorId(id);
+    public void actualizarPorId(String id, Producto producto) {
 
-        if (prod != null) {
-            prod.setDescripcion(p.getDescripcion());
-            prod.setFoto(p.getFoto());
-            prod.setNombre(p.getNombre());
-            prod.setPrecio(p.getPrecio());
-            prod.setVendedor(p.getVendedor());
-
-            guardar(prod);
-        }
     }
 
+
     @Override
-    public List<Producto> obtenerPorNombreCoincidente(String nombre) {
-        List<Producto> coincidentes = productoRepository.findByNombreContainingIgnoreCase(nombre);
-        if (coincidentes != null) {
-            return coincidentes;
-        }
-        return List.of();
+    public List<Producto> obtenerPorNombreCoincidente(String nombreProducto) {
+        List<Producto> coincidentes = productoRepository.findByNombreContainingIgnoreCase(nombreProducto);
+        return coincidentes != null ? coincidentes : List.of();
     }
 }

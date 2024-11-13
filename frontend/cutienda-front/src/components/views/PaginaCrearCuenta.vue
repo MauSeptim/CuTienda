@@ -205,8 +205,9 @@ export default {
       form.append("foto", this.formData.foto);
 
 
-      console.log(form);
-      axios.post('http://localhost:8011/cutienda/registro', form, {
+      console.log([...form.entries()]); // Para verificar los datos que se están enviando
+
+      axios.post('http://localhost:8011/api/cutienda/registro', form, {
         headers: {"Content-Type":"multipart/form-data"}
       })
       .then(response => {
@@ -224,7 +225,8 @@ export default {
         this.$router.push('Usuario');
       })
       .catch(error => {
-        Swal.fire('Error', 'Hubo un problema al crear la cuenta', 'error');
+        console.error(error);
+        Swal.fire('Error', error.response.data.error, 'error');
       });
     }
   },

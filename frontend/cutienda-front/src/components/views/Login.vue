@@ -76,9 +76,12 @@ export default {
       this.$router.push('/');
     },
     submitForm() {
-      const { email, password, role } = this.formData;
+      const form = new FormData();
+      form.append('email', this.formData.email);
+      form.append('password', this.formData.password); 
+      form.append('role', this.formData.role);
 
-      axios.post('http://localhost:8011/api/cutienda/login', { email, password, role })
+      axios.post('http://localhost:8011/api/cutienda/login', form)
         .then(response => {
           // Manejar la respuesta exitosa aquí
           console.log(response.data);
@@ -131,7 +134,7 @@ export default {
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   color: #333; /* Texto oscuro dentro del contenedor */
-  gap: 50px;
+  gap: 10px;
 }
 
 .roles {
@@ -139,9 +142,8 @@ export default {
 }
 
 .inputs {
-    padding: 20px;
-  width: 100%;
-  border: 1px solid #ccc;
+    padding: 20px; 
+    width: 100%;
 }
 
 .form-group {
@@ -168,7 +170,6 @@ export default {
 .input-field {
   width: 100%;
   padding: 10px;
-  border: 1px solid #ccc;
   border-radius: 4px;
   box-sizing: border-box;
 }

@@ -88,7 +88,12 @@ public class UsuarioController {
             if (usuario != null && selectedRole.equals(usuario.getTipo())) {
                 response.put("usuario", usuario);
                 return ResponseEntity.ok(response);
-            } else {
+            }
+            else if (selectedRole.isEmpty()) {
+                response.put("error", "Elige admin o cliente");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            }
+            else {
                 response.put("error", "Correo o contraseña incorrectos, o rol seleccionado no coincide con el rol del usuario.");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
             }

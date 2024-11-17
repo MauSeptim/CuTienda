@@ -40,6 +40,9 @@ public class NotificacionService {
         }
         throw new RuntimeException("Notificación no encontrada con el ID: " + id);
     }
+    public List<Notificacion> buscarNotificacionesExceptoEsteIdUser(int userId) {
+        return notificacionRepository.findByIdUsuarioNot(userId);
+    }
 
     // Eliminar una notificación
     public void eliminarNotificacion(Long id) {

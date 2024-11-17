@@ -73,25 +73,30 @@ export default {
   },
   methods: {
     crearCuenta() {
-      this.$router.push('/');
+      this.$router.push('/crear-cuenta');
     },
-    submitForm() {
+    async submitForm() {
       const form = new FormData();
       form.append('email', this.formData.email);
       form.append('password', this.formData.password); 
       form.append('role', this.formData.role);
-
-      axios.post('http://localhost:8011/api/cutienda/login', form)
-        .then(response => {
-          // Manejar la respuesta exitosa aquí
-          console.log(response.data);
-          Swal.fire('Éxito', 'Inicio de sesión exitoso', 'success');
-        })
-        .catch(error => {
-          // Manejar el error aquí
+      
+      try {
+        const response = await axios.post('http://localhost:8011/api/cutienda/login', form);
+         // Manejar la respuesta exitosa aquí
+         console.log(response.data.usuario);
+         Swal.fire('Éxito', 'Inicio de sesión exitoso', 'success');
+         this.$router.push({name: 'Usuario', params: {email: response.data.usuario.correoElectronico}});
+      }
+      catch(error) {
+        if (error.response) {
           console.error(error.response.data);
           Swal.fire('Error', error.response.data.error || 'Error durante la autenticación', 'error');
-        });
+        } 
+        else {
+          Swal.fire('Error','Error durante la autenticación', 'error');
+        } 
+      }
     }
   }
 };
@@ -193,5 +198,32 @@ export default {
 
 .button:hover {
   background-color: #218838;
+}
+@media (max-width: 480px) {
+  .encabezado {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .encabezado span {
+    font-size: 18px;
+  }
+
+  .roles {
+    margin-bottom: 15px;
+  }
+
+  .form-group label {
+    font-size: 14px;
+  }
+
+  .input-field {
+    padding: 8px;
+  }
+
+  .button {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
 }
 </style>

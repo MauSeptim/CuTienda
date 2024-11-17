@@ -6,9 +6,15 @@ import boton from '../Boton.vue';
 import axios from 'axios';
 import CuadroProducto from '../CuadroProducto.vue';
 import { useRouter } from 'vue-router';
+import { onMounted } from 'vue';
 
 let productos = ref([]);
+let email = ref('');
 const router = useRouter()
+
+onMounted(() => {
+  email.value = router.currentRoute.value.params.email;
+});
 
 // Función para buscar productos en la API
 const buscarProductos = async (query) => {
@@ -27,7 +33,28 @@ const buscarProductos = async (query) => {
 };
 
 const aPerfil = () => {
-    router.push('Usuario');
+    router.push({name: 'Usuario', params: {email: email.value}});
+};
+
+const notificacion = () => {
+    let form = new FormData();
+    form.append('email', email.value);
+
+    axios.post('http://localhost:8011/api/cutienda/correo', form
+        .then(response => {
+          // Manejar la respuesta exitosa aquí
+          router.push({name: 'Notificaciones', params: {email: email.value}});
+          console.log(response.data);
+        })
+        .catch(error => {
+          // Manejar el error aquí
+          console.error(error);
+
+          if (error.response) {
+            console.error(error.response.data);
+            Swal.fire('Error', error.response.data.error || 'Error durante la autenticación', 'error');
+          }
+        }));
 };
 
 </script>
@@ -39,7 +66,7 @@ const aPerfil = () => {
       <h1>CuTienda</h1>
     </nav>
     <div class="botones-superiores" id="botones-superiores">
-      <boton :texto="'Notificaciones'"/>
+      <boton :texto="'Notificaciones'" @click="notificacion"/>
       <boton :texto="'Perfil'" @click="aPerfil"/>
     </div>
   

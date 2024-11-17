@@ -19,7 +19,7 @@ public class Notificacion {
 
     @Setter
     @Getter
-    private int id_usuario;
+    private int idUsuario;
     @Setter
     @Getter
     private String mensaje;
@@ -34,8 +34,8 @@ public class Notificacion {
     private boolean leido;
 
     // Constructor
-    public Notificacion(int id_usuario,String mensaje, String categoria, LocalDateTime fecha, boolean leido) {
-        this.id_usuario = id_usuario;
+    public Notificacion(int idUsuario, String mensaje, String categoria, LocalDateTime fecha, boolean leido) {
+        this.idUsuario = idUsuario;
         this.mensaje = mensaje;
         this.categoria = categoria;
         this.fecha = fecha;
@@ -54,7 +54,7 @@ public class Notificacion {
                 ", categoria='" + categoria + '\'' +
                 ", fecha=" + fecha +
                 ", leido=" + leido +
-                ", id_usuario=" + id_usuario +
+                ", id_usuario=" + idUsuario +
                 '}';
     }
 }

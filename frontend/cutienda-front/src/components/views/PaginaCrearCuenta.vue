@@ -216,21 +216,28 @@ export default {
       })
       .then(response => {
         localStorage.setItem("user", {
+          id: response.data.id,
           nombre: this.formData.nombre,
           apellidos: this.formData.apellidos,
-          contraseña: this.formData.password,
+          password: this.formData.password,
           telefono: this.formData.telefono,
-          correoElectronico: this.formData.email,
+          email: this.formData.email,
           tipo: this.formData.role,
           foto: this.formData.foto,
-          confirmacionContraseña: this.formData.confirmPassword,
+          confirmPassword: this.formData.confirmPassword,
         });
         Swal.fire('Éxito', 'Cuenta creada exitosamente', 'success');
-        this.$router.push('Usuario');
+        this.$router.push({name: 'Usuario', params: {email: response.data.email}});
       })
       .catch(error => {
         console.error(error);
-        Swal.fire('Error', error.response.data.error, 'error');
+        if (error.response) {
+          Swal.fire('Error', error.response.data.error, 'error');
+          return;
+        }
+        else {
+          Swal.fire('Error de conexión', 'Revisa tu conexion a internet', 'error');
+        }
       });
     }
   },
@@ -238,8 +245,11 @@ export default {
 </script>
 
 <style scoped>
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap");
+
 * {
   color: #f9f9f9;
+  font-family: "Roboto", sans-serif;
 }
 .padre {
   display: flex;
@@ -321,6 +331,9 @@ export default {
   height: 5em;
   width: 30em;
   font-size: 1em;
+}
+input {
+  font-size: 1.1rem;
 }
 @media (max-width: 950px) {
   .inputs {

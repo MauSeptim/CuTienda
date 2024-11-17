@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.OptionalInt;
 
 @Service
 public class UsuarioService {
@@ -37,7 +38,7 @@ public class UsuarioService {
         });
     }
 
-    public Optional<Usuario> existeCorreo(String correoElectronico) {
+    public Optional<Usuario> encontrarPorCorreo(String correoElectronico) {
         return usuarioRepository.findByCorreoElectronico(correoElectronico);
     }
 
@@ -52,6 +53,10 @@ public class UsuarioService {
             // Manejar la situación si el usuario no existe (opcional)
             throw new RuntimeException("Usuario no encontrado con ID: " + id);
         }
+    }
+
+    public Optional<Usuario> buscarPorId (Long id) {
+        return usuarioRepository.findById(id);
     }
 
     public Usuario actualizarUsuario(Usuario usuario) {

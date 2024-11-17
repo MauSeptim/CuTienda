@@ -3,7 +3,9 @@ package com.cutienda.usuarios.controllers;
 import com.cutienda.usuarios.models.Usuario;
 import com.cutienda.usuarios.services.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,7 +14,6 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -24,7 +25,7 @@ public class UsuarioController {
 
     // Endpoint para registrar un usuario
     @PostMapping("/registro")
-    public ResponseEntity<Map<String, String>> registrarUsuario(
+    public ResponseEntity<Map<String, Object>> registrarUsuario(
             @RequestParam("nombre") String nombre,
             @RequestParam("apellidos") String apellidos,
             @RequestParam("email") String correoElectronico,
@@ -34,9 +35,9 @@ public class UsuarioController {
             @RequestParam("confirmPassword") String confirmacionContraseña,
             @RequestParam("foto") MultipartFile foto) {
 
-        Map<String, String> response = new HashMap<>();
+        Map<String, Object> response = new HashMap<>();
         try {
-            if (usuarioService.existeCorreo(correoElectronico).isPresent()) {
+            if (usuarioService.encontrarPorCorreo(correoElectronico).isPresent()) {
                 response.put("error", "El correo electrónico ya está en uso");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
@@ -63,8 +64,8 @@ public class UsuarioController {
                 return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(response);
             }
 
-            usuarioService.registrarUsuario(usuario);
-            response.put("message", "Usuario registrado con éxito");
+            Usuario resp =  usuarioService.registrarUsuario(usuario);
+            response.put("message", resp);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (IOException e) {
             response.put("error", "Error al cargar la foto: " + e.getMessage());
@@ -72,6 +73,21 @@ public class UsuarioController {
         } catch (Exception e) {
             response.put("error", "Error al registrar usuario: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+    @PostMapping("/correo")
+    public ResponseEntity<Object> conseguirUsuarioPorEmail(@RequestParam("email") String email) {
+        Usuario user = usuarioService.encontrarPorCorreo(email).orElse(null);
+        Map<String, Object> response;
+
+        if (user == null) {
+            response = new HashMap<>();
+            response.put("message", "No existe usuario con ese correo");
+            response.put("error", HttpStatus.NOT_FOUND);
+            return ResponseEntity.ok(response);
+        }
+        else {
+            return ResponseEntity.ok(user);
         }
     }
 
@@ -101,6 +117,20 @@ public class UsuarioController {
             response.put("error", "Error durante la autenticación: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
+    }
+    @PostMapping("/id")
+    public ResponseEntity<Object> conseguirIdPorCorreo(@RequestParam("email") String email) {
+        Usuario user = usuarioService.encontrarPorCorreo(email).orElse(null);
+        Map<String, Object> response = new HashMap<>();
+
+        if (user == null) {
+            response.put("message", "No existe usuario con ese correo");
+            response.put("error", HttpStatus.NOT_FOUND);
+        }
+        else {
+            response.put("id", user.getId());
+        }
+        return ResponseEntity.ok(response);
     }
 
     // Endpoint para recuperar la contraseña
@@ -199,5 +229,19 @@ public class UsuarioController {
             response.put("error", "Error al actualizar perfil: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
+    }
+    @GetMapping("/{id}/foto")
+    public ResponseEntity<byte[]> obtenerFoto(@PathVariable Long id) {
+        return usuarioService.buscarPorId(id)
+                .map(usuario -> {
+                    byte[] imagen = usuario.getFotoUrl();
+                    if (imagen != null) {
+                        HttpHeaders headers = new HttpHeaders();
+                        headers.setContentType(MediaType.IMAGE_JPEG); // O MediaType.IMAGE_PNG según corresponda
+                        return new ResponseEntity<byte[]>(imagen, headers, HttpStatus.OK); // Asegúrate de especificar el tipo
+                    }
+                    return new ResponseEntity<byte[]>(HttpStatus.NOT_FOUND); // Asegúrate de especificar el tipo
+                })
+                .orElse(new ResponseEntity<byte[]>(HttpStatus.NOT_FOUND)); // Asegúrate de especificar el tipo
     }
 }

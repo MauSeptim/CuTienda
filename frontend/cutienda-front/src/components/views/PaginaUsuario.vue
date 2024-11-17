@@ -1,62 +1,24 @@
 <template>
-  <div>
-    <!-- Encabezado -->
-    <header class="encabezado">
-        <CutiendaLeon />
-        <Boton class="botones-superiores" :texto="'Buscar productos'" @click="prod"/>
-    </header>
+  <div class="padre">
+    <div class="encabezado">
+      <CutiendaLeon />
+    </div>
 
-    <!-- Contenedor Principal -->
     <div class="container">
-      <!-- Sección de Perfil -->
-      <section class="profile-section">
-        <img :src="usuarioFoto" alt="Imagen de Perfil" class="profile-image" />
-        <p class="profile-name">{{ usuario.nombre }} {{ usuario.apellidos }}</p>
-      </section>
+      <div class="profile-section">
+        <img :src="usuario.fotoUrl" alt="Imagen de Perfil" class="profile-image" id="fotoUrl">
+        <h2>{{ usuario.nombre }} {{ usuario.apellidos }}</h2>
+        <p>{{ usuario.correoElectronico }}</p>
+        <p>{{ usuario.telefono }}</p>
+        <label for="foto" class="upload-label">Cambiar Imagen</label>
+        <input type="file" id="foto" @change="onFileChange" accept="image/png, image/jpeg" class="upload-input">
+      </div>
 
-      <!-- Tabs -->
-      <nav class="tabs">
-        <ul>
-          <li  @click="cambiarTab('perfil')" :class="{ active: tabActiva === 'perfil' }">Perfil</li>
-          <li @click="cambiarTab('notificaciones')" :class="{ active: tabActiva === 'notificaciones' }">Notificaciones</li>
-          <li @click="cambiarTab('configuracion')" :class="{ active: tabActiva === 'configuracion' }">Configuración</li>
-        </ul>
-      </nav>
-
-      <!-- Contenido de las Tabs -->
-      <section class="tab-content">
-        <div v-if="tabActiva === 'perfil'" class="perfil-content">
-          <h2>Información del Perfil</h2>
-          <p><strong>Correo Electrónico:</strong> {{ usuario.correoElectronico }}</p>
-          <p><strong>Teléfono:</strong> {{ usuario.telefono }}</p>
-          <button @click="activarEdicion" class="edit-button">Editar</button>
-        </div>
-
-        <div v-else-if="tabActiva === 'notificaciones'" class="notificaciones-content">
-          <h2>Notificaciones</h2>
-          <p>Aquí puedes ver tus notificaciones.</p>
-        </div>
-
-        <div v-else-if="tabActiva === 'configuracion'" class="configuracion-content">
-          <h2>Configuración</h2>
-          <p>Aquí puedes ajustar la configuración de tu cuenta.</p>
-        </div>
-
-        <!-- Formulario de Edición (visible solo en modo edición) -->
-        <section v-if="modoEdicion" class="form-section">
-          <form @submit.prevent="guardarCambios">
-            <div v-for="(campo, index) in camposFormulario" :key="index" class="form-group">
-              <label :for="campo.id">{{ campo.label }}</label>
-              <input :type="campo.type" :id="campo.id" v-model="usuario[campo.modelo]" :required="campo.required" />
-            </div>
-
-            <div class="buttons">
-              <button type="submit" class="save">Guardar Cambios</button>
-              <button type="button" @click="cancelarEdicion" class="cancel">Cancelar</button>
-            </div>
-          </form>
-        </section>
-      </section>
+      <div class="actions-section">
+        <button @click="editarPerfil" class="action-button">Editar Perfil</button>
+        <button @click="verNotificaciones" class="action-button">Ver Notificaciones</button>
+        <button v-if="usuario.tipo === 'admin'" @click="registrarProducto" class="action-button">Registrar Producto</button>
+      </div>
     </div>
   </div>
 </template>
@@ -64,224 +26,152 @@
 <script>
 import Swal from "sweetalert2";
 import CutiendaLeon from "../icons/CutiendaLeon.vue";
-import Boton from "../Boton.vue";
+import axios from "axios";
 
 export default {
-    name: 'PaginaUsuario',
-    components: {
-        CutiendaLeon,
-        Boton,
-    },
-    data() {
+  name: 'PaginaUsuario',
+  components: {
+    CutiendaLeon,
+  },
+  data() {
     return {
-
-        usuario: {
-            nombre: "",
-            apellidos: "",
-            correoElectronico: "",
-            telefono: "",
-            contraseña: "",
-            contraseña: "",
-            tipo: "",
-            fotoUrl: "",
-        },
-      modoEdicion: false,
-      tabActiva: "perfil",
-      camposFormulario: [
-        { id: "nombre", label: "Nombre", type: "text", modelo: "nombre", required: true },
-        { id: "apellidos", label: "Apellidos", type: "text", modelo: "apellidos", required: true },
-        { id: "correoElectronico", label: "Correo Electrónico", type: "email", modelo: "correoElectronico", required: true },
-        { id: "telefono", label: "Teléfono", type: "tel", modelo: "telefono", required: true },
-        { id: "contrasena", label: "Contraseña", type: "password", modelo: "contrasena", required: true },
-      ],
-      usuarioFoto: "/path/to/default/image.png",
+      usuario: {
+        nombre: '',
+        apellidos: '',
+        correoElectronico: '',
+        telefono: '',
+        tipo: ''
+      },
     };
   },
   methods: {
-    prod() {
-        this.$router.push('Productos');
+    editarPerfil() {
+      this.$router.push({ name: 'EditarPerfil', params: { id: this.usuario.id } });
     },
-    cambiarTab(tab) {
-      this.tabActiva = tab;
+    verNotificaciones() {
+      this.$router.push({ name: 'Notificaciones', params: { id: this.usuario.id } });
     },
-    activarEdicion() {
-      this.modoEdicion = true;
+    registrarProducto() {
+      this.$router.push({ name: 'RegistrarProducto' , params: { id: this.usuario.id } });
     },
-    cancelarEdicion() {
-      this.modoEdicion = false;
-    },
-    guardarCambios() {
-      this.modoEdicion = false;
-      Swal.fire("Guardado con éxito", "Tus cambios han sido guardados", "success");
-    },
-    mounted() {
-      // Obtener el objeto del localStorage y parsearlo
-    const usuarioGuardado = JSON.parse(localStorage.getItem("user"));
-    if (usuarioGuardado) {
-      // Asignar el objeto guardado a la propiedad usuario
-      this.usuario = { ...this.usuario, ...usuarioGuardado };
-      // Si tienes una URL de foto de usuario, puedes asignarla también
-      if (usuarioGuardado.fotoUrl) {
-        this.usuarioFoto = usuarioGuardado.fotoUrl;
-      }
+    foto() {
+      axios.get(`http://localhost:8011/api/cutienda/${this.usuario.id}/foto`)
+      .then(response => {
+        this.usuario.fotoUrl = response.data;
+        return response.data;
+      })
+      .catch(error => {
+        console.error(error);
+      });
     }
-    }
+
+  },
+  mounted() {
+    const form = new FormData();
+    form.append('email', this.$route.params.email);
+    axios.post("http://localhost:8011/api/cutienda/correo", form)
+    .then(response => {
+      this.usuario = response.data;
+      this.foto();
+        console.log("Usuario:", this.usuario);
+      })
+      .catch(error => {
+        console.error("Error al obtener el usuario:", error);
+      });
   },
 };
 </script>
 
 <style scoped>
-* {
-    color: #f9f9f9;
-}
 body {
   color: white;
   font-family: Arial, sans-serif;
-  background-color: #001f5f;
-  margin: 0;
+  background-color: #002160;
+  margin: 5%;
   padding: 0;
 }
+
 .encabezado {
-  background-color: #001f5f;
-  height: auto; 
-  position: relative;
-  width: 100%;
   display: flex;
   justify-content: center;
-  padding: 20px 0;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  align-items: center;
+  padding: 20px;
+  background-color: #002160;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
-.encabezado img {
-  width: 7rem;
-  height: 7rem;
-  transform: translateY(-30px);
-}
+
 .container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 10px;
+  margin-top: 20px;
+  width: 100%;
+  max-width: 900px;
+  background: #002160;
+  padding: 40px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 50px;
+  border-radius: 8px;
+}
+
+.profile-section {
+  width: 40%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: start;
-  gap: 20px;
 }
-.profile-section {
-  background-color: #002160;
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-  text-align: center;
-}
-.profile-image {
-  width: 150px;
-  height: 150px;
+
+.profile-section img {
+  width: 200px;
+  height: 200px;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid #ffffff;
+  margin-bottom: 20px;
 }
-.profile-name {
-  margin: 10px 0;
-  font-size: 18px;
-  font-weight: bold;
-  color: #f0f0f0;
-}
-.tabs {
-  margin: 20px 0;
-}
-.tabs ul {
-  display: flex;
-  list-style-type: none;
-  padding: 0;
-  gap: 5px;
-}
-.buttons, .tabs li {
-  cursor: pointer;
-  padding: 10px 15px;
-  border-radius: 5px;
-  background-color: #003366;
-  transition: background-color 0.3s;
-}
-.tabs li:hover {
-  background-color: #004080;
-}
-.tabs li.active {
-  background-color: #4e73df;
-}
-.tab-content {
-  width: 100%;
-  max-width: 600px;
-}
-.perfil-content,
-.notificaciones-content,
-.configuracion-content {
-  background-color: #002160;
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-}
-.perfil-content h2, p{
-    padding: 15px 0;
-}
-.edit-button {
-  background-color: #4e73df;
-  color: white;
-  padding: 8px 15px;
-  border: none;
-  border-radius: 5px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-.edit-button:hover {
-  background-color: #3a61c9;
-}
-.form-section {
-  margin-top: 20px;
-}
-.form-group {
-  margin-bottom: 15px;
-}
-.form-group label {
-  display: block;
-  margin-bottom: 5px;
-}
-.form-group input {
-  width: 100%;
-  padding: 10px;
-  border-radius: 5px;
-  border: none;
-  outline: none;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-.buttons {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
-}
-.buttons button {
-  background-color: #28a745;
-  color: white;
+
+.upload-label {
+  background-color: #007bff;
+  color: #fff;
   padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  font-weight: bold;
+  border-radius: 4px;
   cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.upload-label:hover {
+  background-color: #0056b3;
+}
+
+.upload-input {
+  display: none;
+}
+
+.actions-section {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.action-button {
+  padding: 15px 30px;
+  background-color: #28a745;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
   transition: background-color 0.3s, box-shadow 0.3s;
 }
-.buttons .cancel {
-  background-color: #6c757d;
-}
-.buttons button:hover {
-  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
-}
-.botones-superiores {
-  position: absolute;
-  top: 0;      /* Alínea al borde superior */
-  right: 0;    /* Alínea al borde derecho */
-  display: flex;
-  gap: 10px;   /* Espacio entre los botones */
-  margin: 20px; /* Margen para separarlos un poco del borde */
 
+.action-button:hover {
+  background-color: #218838;
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
+.profile-image img {
+  width: 3rem;
+  height: 3rem;
 }
 </style>

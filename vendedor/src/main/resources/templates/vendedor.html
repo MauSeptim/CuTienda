@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vista Cliente - CUT-TIENDA</title>
+  <style>
+    body {
+    font-family: Arial, sans-serif;
+    background-color: #001848;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Cambiado para alinear al inicio */
+    height: 100vh;
+    margin: 0;
+    padding-top: 20px; /* Espacio superior para dar margen al contenedor */
+}
+
+.container {
+    background-color: #001848;
+    border-radius: 15px;
+    width: 550px;
+    max-height: 90vh; /* Altura máxima del contenedor */
+    overflow-y: auto; /* Habilita el scroll vertical */
+    padding: 20px;
+    margin-top: 30px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+    .header {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 20px;
+    }
+    .header img {
+        width: 400px;
+        border-radius: 10%;
+    }
+    .profile-info {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        align-items: center;
+        margin-top: 20px;
+    }
+    .profile-info img {
+        border-radius: 10px;
+        width: 150px;
+        height: 150px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s ease;
+    }
+    .profile-info img:hover {
+        transform: scale(1.05);
+    }
+    .details {
+        text-align: left;
+        color: #fff;
+    }
+    .details label {
+        display: block;
+        font-weight: bold;
+        margin-top: 5px;
+    }
+    .details input {
+        width: 100%;
+        padding: 5px;
+        margin-top: 3px;
+        border-radius: 5px;
+        border: none;
+    }
+    .characteristics {
+        margin-top: 10px;
+    }
+    .characteristics textarea {
+        width: 100%;
+        padding: 10px;
+        border-radius: 5px;
+        border: none;
+    }
+    .rating {
+        margin-top: 15px;
+    }
+    .rating span {
+        font-size: 30px;
+        color: lightgray;  /* Color por defecto para estrellas vacías */
+    }
+
+    .filled {
+        color: gold;  /* Color dorado para la estrella llena */
+    }
+
+    .half-filled {
+        background: linear-gradient(to left, gold 50%, lightgray 50%);
+        color: transparent;  /* Esto asegura que solo el fondo sea dorado */
+        -webkit-background-clip: text;  /* Para que el fondo dorado se aplique solo al texto */
+    }
+
+    .empty {
+        color: lightgray;  /* Color para las estrellas vacías */
+    }
+
+    .buttons {
+        margin-top: 15px;
+    }
+    .buttons button {
+        padding: 10px 20px;
+        margin: 5px;
+        border: none;
+        border-radius: 5px;
+        color: #fff;
+        background-color: #3b5998;
+        cursor: pointer;
+    }
+    .buttons button:hover {
+        background-color: #2d4373;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Header con logo centrado -->
+  <div class="header">
+    <img th:src="@{/logo.png}" alt="CUT-TIENDA Logo">
+  </div>
+
+  <div class="subtitle">CUT-TIENDA</div>
+
+  <div class="profile-info">
+    <!-- Foto del vendedor -->
+    <img th:src="${vendedor.fotoUrlBase64}" alt="Foto del Vendedor">
+
+    <!-- Mapa que abre Google Maps al hacer clic -->
+    <!-- Imagen de mapa que redirige a Google Maps -->
+    <img th:src="@{/map.jpeg}" alt="Ver en Google Maps" class="map-img"
+         th:onclick="'window.open(\'https://www.google.com/maps?q=' + ${producto.latitud} + ',' + ${producto.longitud} + '\', \'_blank\')'">
+
+  </div>
+
+  <div th:if="${vendedor != null}" class="details">
+    <label>Vendedor:</label>
+    <input type="text" th:value="${vendedor.nombre}" readonly>
+    <input type="text" th:value="${vendedor.apellidos}" readonly>
+    <label>Número:</label>
+    <input type="text" th:value="${vendedor.telefono}" readonly>
+    <label>Correo electrónico:</label>
+    <input type="text" th:value="${vendedor.correo_electronico}" readonly>
+  </div>
+
+  <div class="characteristics">
+    <label>Comentarios:</label>
+    <!-- Itera sobre los comentarios -->
+    <div th:each="comentario : ${comentarios}">
+      <textarea rows="3" readonly th:text="${comentario.contenido}">Comentario de ejemplo</textarea>
+    </div>
+  </div>
+
+  <div class="rating" id="rating">
+    <!-- Las estrellas se llenarán dinámicamente con el promedio de calificación -->
+    <span class="star" data-value="1">⭐</span>
+    <span class="star" data-value="2">⭐</span>
+    <span class="star" data-value="3">⭐</span>
+    <span class="star" data-value="4">⭐</span>
+    <span class="star" data-value="5">⭐</span>
+  </div>
+
+  <!-- Si no se encuentra el vendedor, mostrar un mensaje de error -->
+  <div th:if="${vendedor == null}">
+    <p th:text="'Vendedor no encontrado con ID: ' + ${error}"></p>
+  </div>
+
+  <div class="buttons">
+    <button>Calificar vendedor</button>
+    <button>Ver productos</button>
+  </div>
+</div>
+
+<script>
+  // Obtener el valor de la calificación promedio desde Thymeleaf
+var promedioCalificacion = [[${promedioCalificacion}]];
+console.log("Promedio calificación:", promedioCalificacion);
+
+document.addEventListener("DOMContentLoaded", function() {
+    var promedioCalificacion = parseFloat(promedioCalificacion); // Convertir a decimal por si es necesario
+    var fullStars = Math.floor(promedioCalificacion);
+    var hasHalfStar = promedioCalificacion % 1 >= 0.5;
+    var stars = document.querySelectorAll('#rating .star');
+
+    stars.forEach(function(star, index) {
+        star.classList.remove('filled', 'half-filled', 'empty'); // Limpiar clases
+
+        if (index < fullStars) {
+            star.classList.add('filled'); // Estrella llena
+        } else if (index === fullStars && hasHalfStar) {
+            star.classList.add('half-filled'); // Media estrella
+        } else {
+            star.classList.add('empty'); // Estrella vacía
+        }
+    });
+});
+
+</script>
+<script>
+  function openGoogleMaps(lat, lng) {
+      // Verifica si las coordenadas son válidas
+      if (lat && lng) {
+          // Crea la URL de Google Maps
+          const url = `https://www.google.com/maps?q=${lat},${lng}`;
+          // Abre Google Maps en una nueva pestaña
+          window.open(url, '_blank');
+      } else {
+          alert('Las coordenadas no son válidas');
+      }
+  }
+</script>
+
+</body>
+</html>

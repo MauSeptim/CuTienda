@@ -4,7 +4,9 @@
             <img :src="producto.fotoBase64" alt="Imagen del producto" class="product-image" />
             <h2>{{ producto.nombre }}</h2>
             <p>{{ producto.descripcion }}</p>
-            <button @click="openGoogleMaps">Ver en Google Maps</button>
+            <button @click="openGoogleMaps" class="maps-button"> 
+                Ver en Google Maps
+            </button>
         </div>
         <div class="comments-section">
             <h3>Comentarios</h3>
@@ -20,7 +22,7 @@
                 <div class="rating">
                     <span v-for="star in 5" :key="star" class="star" :class="{ filled: star <= nuevoComentario.calificacion }" @click="setRating(star)">★</span>
                 </div>
-                <button @click="guardarComentario">Enviar</button>
+                <button @click="guardarComentario" class="submit-button">Enviar</button>
             </div>
         </div>
     </div>
@@ -33,7 +35,11 @@ export default {
     name: 'Comentarios',
     data() {
         return {
-            producto: {},
+            producto: {
+                fotoBase64: '',
+                nombre: '',
+                descripcion: ''
+            },
             comentarios: [],
             nuevoComentario: {
                 contenido: '',
@@ -95,6 +101,14 @@ export default {
 </script>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #002060;
+    color: #fff;
+}
+
 .comentarios-container {
     display: flex;
     flex-direction: column;
@@ -103,49 +117,114 @@ export default {
 }
 
 .product-info {
-    text-align: center;
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    margin-bottom: 20px;
+    color: white;
 }
 
 .product-image {
-    width: 300px;
-    height: auto;
-    border-radius: 10px;
+    width: 100%;
+    max-width: 300px;
+    border-radius: 8px;
+    box-shadow: rgba(240, 46, 170, 0.4) 0px 5px, rgba(240, 46, 170, 0.3) 0px 10px, rgba(240, 46, 170, 0.2) 0px 15px, rgba(240, 46, 170, 0.1) 0px 20px, rgba(240, 46, 170, 0.05) 0px 25px;
+}
+
+.maps-button {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.maps-button i {
+    font-size: 18px;
+}
+
+.maps-button:hover {
+    background-color: #0056b3;
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
 }
 
 .comments-section {
+    color: white;
     width: 100%;
     max-width: 600px;
-    margin-top: 20px;
+}
+
+.comments-section h3 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    font-weight: bold;
 }
 
 .comment {
-    border-bottom: 1px solid #ccc;
-    padding: 10px 0;
+    background-color: #1a1a1a;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.comment p {
+    margin: 0 0 10px;
 }
 
 .rating {
     display: flex;
+    gap: 5px;
 }
 
 .star {
     font-size: 20px;
-    cursor: pointer;
+    color: #ccc;
 }
 
 .star.filled {
-    color: gold;
+    color: #ffc107;
+}
+
+.comment-date {
+    font-size: 12px;
+    color: #aaa;
 }
 
 .add-comment {
     margin-top: 20px;
 }
 
-textarea {
+.add-comment textarea {
     width: 100%;
-    height: 100px;
-    margin-bottom: 10px;
     padding: 10px;
-    border-radius: 5px;
+    border-radius: 4px;
     border: 1px solid #ccc;
+    background-color: #f9f9f9;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.submit-button {
+    background-color: #28a745;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.submit-button:hover {
+    background-color: #218838;
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
 }
 </style>

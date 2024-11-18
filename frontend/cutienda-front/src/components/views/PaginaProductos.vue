@@ -19,11 +19,16 @@ onMounted(() => {
 // Función para buscar productos en la API
 const buscarProductos = async (query) => {
   try {
+
+    if (productos.value.length > 0) {
+      productos.value = [];
+    } 
+
     const url = query 
       ? `http://localhost:8010/cutienda/api/productos/buscar?nombre=${query}` 
       : 'http://localhost:8010/cutienda/api/productos';  // Si no hay query, obtienes todos los productos
 
-    const response = await axios.get(url);
+    const response = await axios.get(url);   
 
     productos.value = response.data;  // Actualiza la lista de productos
   } catch (error) {

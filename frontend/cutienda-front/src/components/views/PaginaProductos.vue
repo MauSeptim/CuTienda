@@ -41,25 +41,9 @@ const aPerfil = () => {
     router.push({name: 'Usuario', params: {email: email.value}});
 };
 
-const notificacion = () => {
-    let form = new FormData();
-    form.append('email', email.value);
-
-    axios.post('http://localhost:8011/api/cutienda/correo', form
-        .then(response => {
-          // Manejar la respuesta exitosa aquí
-          router.push({name: 'Notificaciones', params: {id: response.data.id}});
-          console.log(response.data);
-        })
-        .catch(error => {
-          // Manejar el error aquí
-          console.error(error);
-
-          if (error.response) {
-            console.error(error.response.data);
-            Swal.fire('Error', error.response.data.error || 'Error durante la autenticación', 'error');
-          }
-        }));
+const notificacion = () => { 
+  const id = router.currentRoute.value.params.id;
+  router.push({name: 'Notificaciones', params: {id: id}});
 };
 
 </script>

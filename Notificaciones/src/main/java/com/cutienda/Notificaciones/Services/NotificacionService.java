@@ -25,9 +25,11 @@ public class NotificacionService {
     }
 
     // Crear una nueva notificación
-    public Notificacion crearNotificacion(int id_usuario, String mensaje, String categoria, LocalDateTime fecha, boolean leido) {
-        Notificacion nuevaNotificacion = new Notificacion(id_usuario ,mensaje, categoria, fecha, leido);
-        return notificacionRepository.save(nuevaNotificacion);
+    public Notificacion crearNotificacion(Notificacion notificacion) {
+        if (notificacion != null) {
+            return notificacionRepository.save(notificacion);
+        }
+        return null;
     }
 
 

@@ -117,6 +117,16 @@ export default {
             'Content-Type': 'multipart/form-data'
           }
         });
+        const usuario = await axios.get(`http://localhost:8011/api/cutienda/${this.product.id_usuario}`);
+
+        const notificacion = {
+          idUsuario: this.product.id_usuario,
+          mensaje: `${usuario.data.nombre} ${usuario.data.apellidos} esta vendiendo ${this.product.nombre_producto} en ${this.product.precio}$`,
+          categoria: `Nuevo producto a la venta en el CUT`,
+          fecha: new Date().toISOString(),
+          leido: false
+        }
+        const responseNot = await axios.post('http://localhost:8012/api/notificaciones', notificacion);
         Swal.fire('Éxito', 'Producto registrado con éxito', 'success');
       } catch (error) {
         console.error('Error al registrar el producto:', error);

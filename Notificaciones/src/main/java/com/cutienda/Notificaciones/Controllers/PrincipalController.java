@@ -34,14 +34,8 @@ public class PrincipalController {
     // Crear una nueva notificación
     @PostMapping
     public ResponseEntity<Notificacion> crearNotificacion(@RequestBody Notificacion notificacion) {
-        Notificacion nuevaNotificacion = notificacionService.crearNotificacion(
-                notificacion.getIdUsuario(),
-                notificacion.getMensaje(),
-                notificacion.getCategoria(),
-                LocalDateTime.now(),
-                notificacion.isLeido()
-        );
-        return new ResponseEntity<>(nuevaNotificacion, HttpStatus.CREATED);
+        Notificacion nuevaNotificacion = notificacionService.crearNotificacion(notificacion);
+        return ResponseEntity.status(HttpStatus.CREATED).body(nuevaNotificacion);
     }
 
     // Eliminar una notificación por ID

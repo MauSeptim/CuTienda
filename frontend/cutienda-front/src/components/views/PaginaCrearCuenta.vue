@@ -209,8 +209,6 @@ export default {
       form.append("foto", this.formData.foto);
 
 
-      console.log([...form.entries()]); // Para verificar los datos que se están enviando
-
       axios.post('http://localhost:8011/api/cutienda/registro', form, {
         headers: {"Content-Type":"multipart/form-data"}
       })
@@ -227,7 +225,7 @@ export default {
           confirmPassword: this.formData.confirmPassword,
         });
         Swal.fire('Éxito', 'Cuenta creada exitosamente', 'success');
-        this.$router.push({name: 'Usuario', params: {email: response.data.email}});
+        this.$router.push({name: 'Usuario', params: {id: response.data.message.id}});
       })
       .catch(error => {
         console.error(error);

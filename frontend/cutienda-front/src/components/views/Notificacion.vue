@@ -30,13 +30,13 @@ export default {
     return {
       mensaje: 'Notificaciones',
       notificaciones: [],
-      id: null,
+      id: this.$route.params.id,
       intervalId: null,
     };
   },
   computed: {
     notificacionesFiltradas() {
-      return this.notificaciones.filter(notificacion => notificacion.id_usuario !== this.usuarioId);
+      return this.notificaciones.filter(notificacion => notificacion.id_usuario !== this.id);
     }
   },
   created() {
@@ -99,7 +99,7 @@ h1 {
 }
 
 .page-wrapper {
-  width: 70%;
+  width: 50%;
   height: 100%;
 }
 
@@ -118,7 +118,6 @@ h1 {
 
 .notificaciones {
   width: 100%;
-  max-width: 600px;
   background-color: #fff;
   padding: 20px;
   border-radius: 8px;

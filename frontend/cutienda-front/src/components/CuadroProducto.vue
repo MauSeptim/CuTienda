@@ -1,5 +1,6 @@
 <script setup>
 import axios from 'axios';
+import Swal from 'sweetalert2';
 import { defineProps, ref, onMounted } from 'vue';
 
 const props = defineProps({
@@ -9,9 +10,18 @@ const props = defineProps({
     }
 });
 var producto = ref(props.producto);
+var nombreUsuario = ref('');
 var foto = ref(null);
 
 let fetchFoto = () => {
+    axios.get(`http://localhost:8011/api/cutienda/${producto.value.id_usuario}`)
+    .then(response => {
+        nombreUsuario.value = `${response.data.nombre} ${response.data.apellidos}`;
+    })
+    .catch(error => {
+        Swal.fire('Error', 'Error al obtener el nombre del usuario', 'error');
+        console.error(error);
+    });
     // Verificar que el ID del producto está definido antes de hacer la solicitud
     if (producto.value && producto.value.id_producto) {
         axios.get(`http://localhost:8010/cutienda/api/productos/foto/${producto.value.id_producto}`, { responseType: 'arraybuffer' })
@@ -25,6 +35,7 @@ let fetchFoto = () => {
     } else {
         console.error("El ID del producto no está definido.");
     }
+
 };
 
 // Cargar la foto al montar el componente
@@ -46,7 +57,7 @@ onMounted(fetchFoto);
 				<div class="table-data"><img class="foto" :src="producto.foto" alt=""></div>
 				<div class="table-data">{{ producto.nombreProducto }}</div>
 				<div class="table-data">{{ producto.precio }}</div>
-				<div class="table-data">{{ producto.id_usuario }}</div>
+				<div class="table-data">{{ nombreUsuario }}</div>
 				<div class="table-data">{{producto.descripcion}}</div>
 			</div>
 		</div>	

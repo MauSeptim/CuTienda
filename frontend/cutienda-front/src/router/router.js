@@ -7,6 +7,7 @@ import PaginaUsuario from '@/components/views/PaginaUsuario.vue'
 import Login from '@/components/views/Login.vue'
 import Notificacion from '@/components/views/Notificacion.vue'
 import RegistrarProducto from '@/components/views/RegistrarProducto.vue'
+import Comentarios from '@/components/views/Comentarios.vue'
 
 const routes = [
   {
@@ -42,6 +43,11 @@ const routes = [
     path: '/registrar-producto/:id',
     name : 'RegistrarProducto',
     component: RegistrarProducto
+  },
+  {
+    path: '/comentarios/:id_vendedor/:id_producto/:user_id',
+    name : 'Comentarios',
+    component: Comentarios
   }
   // Puedes añadir más rutas aquí
 ]

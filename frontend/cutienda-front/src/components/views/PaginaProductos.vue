@@ -9,11 +9,11 @@ import { useRouter } from 'vue-router';
 import { onMounted } from 'vue';
 
 let productos = ref([]);
-let email = ref('');
 const router = useRouter()
+const idUsuario = ref('');
 
 onMounted(() => {
-  email.value = router.currentRoute.value.params.email;
+  idUsuario.value = router.currentRoute.value.params.id;
 });
 
 // Función para buscar productos en la API
@@ -31,19 +31,19 @@ const buscarProductos = async (query) => {
     const response = await axios.get(url);   
 
     productos.value = response.data;  // Actualiza la lista de productos
+    console.log(productos.value);
   } catch (error) {
     alert('No se pudo obtener todos los productos');
     console.error(error);
   }
 };
 
-const aPerfil = () => {
-    router.push({name: 'Usuario', params: {email: email.value}});
+const aPerfil = () => { 
+  router.push({name: 'Usuario', params: {id: idUsuario.value}});
 };
 
 const notificacion = () => { 
-  const id = router.currentRoute.value.params.id;
-  router.push({name: 'Notificaciones', params: {id: id}});
+  router.push({name: 'Notificaciones', params: {id: idUsuario.value}});
 };
 
 </script>
@@ -64,8 +64,9 @@ const notificacion = () => {
     <div class="producto-container">
   
       <CuadroProducto v-for="producto in productos" 
-                      :key="producto.id" 
+                      :key="producto.id_producto" 
                       :producto="producto"
+                      :id_user="idUsuario"
                       class="iter-cuadro"/>
     </div>  
   </div>

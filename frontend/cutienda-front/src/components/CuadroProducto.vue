@@ -1,16 +1,23 @@
 <script setup>
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import { useRouter } from 'vue-router';
 import { defineProps, ref, onMounted } from 'vue';
 
 const props = defineProps({
     producto: {
         type: Object,
         required: true
+    },
+    id_user: {
+        type: Number,
+        required: true
     }
 });
 var producto = ref(props.producto);
+var id_user = ref(props.id_user);
 var nombreUsuario = ref('');
+var router = useRouter();
 var foto = ref(null);
 
 let fetchFoto = () => {
@@ -38,13 +45,21 @@ let fetchFoto = () => {
 
 };
 
+const verComentarios = () => {
+    router.push({ name: 'Comentarios', params: {
+        id_producto: producto.value.id_producto,
+        id_vendedor: producto.value.id_usuario,
+        user_id: id_user.value 
+    }});
+};
+
 // Cargar la foto al montar el componente
 onMounted(fetchFoto);
 </script>
 
 <template>
 <div class="container">
-	<div class="table">
+	<div class="table" @click="verComentarios">
 		<div class="table-header">
 			<div class="header__item"><a id="name" class="filter__link" href="#">PRODUCTO</a></div>
 			<div class="header__item"><a id="wins" class="filter__link filter__link--number" href="#">NOMBRE</a></div>

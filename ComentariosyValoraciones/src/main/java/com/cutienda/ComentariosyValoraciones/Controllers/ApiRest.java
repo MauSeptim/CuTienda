@@ -10,9 +10,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
+@CrossOrigin(origins = "*")
 @RequestMapping("cutienda2")
 public class ApiRest {
 
@@ -38,6 +40,11 @@ public class ApiRest {
 
         // Retornar los datos del usuario
         return ResponseEntity.ok(usuario);
+    }
+
+    @GetMapping("/comentarios/{vendedorid}")
+    public List<ComentarioModel> comentariosPorVendedor(@PathVariable Long vendedorid) {
+        return comentarioService.comentariosPorVendedor(vendedorid);
     }
 
     /**

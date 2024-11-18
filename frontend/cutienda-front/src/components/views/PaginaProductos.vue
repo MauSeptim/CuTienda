@@ -43,7 +43,7 @@ const notificacion = () => {
     axios.post('http://localhost:8011/api/cutienda/correo', form
         .then(response => {
           // Manejar la respuesta exitosa aquí
-          router.push({name: 'Notificaciones', params: {email: email.value}});
+          router.push({name: 'Notificaciones', params: {id: response.data.id}});
           console.log(response.data);
         })
         .catch(error => {

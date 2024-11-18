@@ -45,7 +45,7 @@ export default {
     return {
       product: {
         nombre_producto: '',
-        id_usuario: '',
+        id_usuario: this.$route.params.id,
         descripcion: '',
         tipo: '',
         precio: '',
@@ -112,7 +112,7 @@ export default {
       form.append('foto', this.product.foto);
 
       try {
-        const response = await axios.post('http://localhost:8011/api/cutienda/productos', form, {
+        const response = await axios.post('http://localhost:8010/cutienda/api/productos/registro', form, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }

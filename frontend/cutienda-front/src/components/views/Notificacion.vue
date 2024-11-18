@@ -23,12 +23,6 @@ import axios from "axios";
 
 export default {
   name: 'Notificacion',
-  props: {
-    user_id: {
-      type: Number,
-      required: true
-    }
-  },
   components: {
     CutiendaLeon,
   },
@@ -36,6 +30,7 @@ export default {
     return {
       mensaje: 'Notificaciones',
       notificaciones: [],
+      id: null,
       intervalId: null,
     };
   },
@@ -45,7 +40,8 @@ export default {
     }
   },
   created() {
-    this.usuarioId = this.$route.params.id;
+    this.id = this.$route.params.id;
+    console.log("id llegado", this.id);
     this.obtenerNotificaciones();
   },
   mounted() {
@@ -61,7 +57,7 @@ export default {
   methods: {
     async obtenerNotificaciones() {
       try {
-        const response = await axios.get(`http://localhost:8012/api/notificaciones/user/${this.user_id}`);
+        const response = await axios.get(`http://localhost:8012/api/notificaciones/user/${this.id}`);
         this.notificaciones = response.data;
       } catch (error) {
         console.error('Error al obtener las notificaciones:', error);

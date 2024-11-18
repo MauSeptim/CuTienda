@@ -86,7 +86,8 @@ export default {
          // Manejar la respuesta exitosa aquí
          console.log(response.data.usuario);
          Swal.fire('Éxito', 'Inicio de sesión exitoso', 'success');
-         this.$router.push({name: 'Usuario', params: {email: response.data.usuario.correoElectronico}});
+         this.$router.push({name: 'Usuario', params: {id: response.data.usuario.id}});
+         console.log("Despues de hacer la llamada");
       }
       catch(error) {
         if (error.response) {

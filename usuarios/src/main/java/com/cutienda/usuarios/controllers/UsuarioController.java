@@ -230,18 +230,26 @@ public class UsuarioController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
+    @GetMapping("/{id}")
+    public ResponseEntity<Object> ObtenerUsuarioPorId(@PathVariable Long id) {
+        Usuario user = usuarioService.buscarPorId(id).orElse(null);
+
+        if (user == null) {
+            Map response = Map.of("message", "No existe este usuario");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+
+        return ResponseEntity.ok(user);
+    }
     @GetMapping("/{id}/foto")
     public ResponseEntity<byte[]> obtenerFoto(@PathVariable Long id) {
-        return usuarioService.buscarPorId(id)
-                .map(usuario -> {
-                    byte[] imagen = usuario.getFotoUrl();
-                    if (imagen != null) {
-                        HttpHeaders headers = new HttpHeaders();
-                        headers.setContentType(MediaType.IMAGE_JPEG); // O MediaType.IMAGE_PNG según corresponda
-                        return new ResponseEntity<byte[]>(imagen, headers, HttpStatus.OK); // Asegúrate de especificar el tipo
-                    }
-                    return new ResponseEntity<byte[]>(HttpStatus.NOT_FOUND); // Asegúrate de especificar el tipo
-                })
-                .orElse(new ResponseEntity<byte[]>(HttpStatus.NOT_FOUND)); // Asegúrate de especificar el tipo
+        Usuario user = usuarioService.buscarPorId(id).orElse(null);
+        if (user != null && user.getFotoUrl() != null) {
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_TYPE, "image/jpeg")  // O el tipo de imagen correcto
+                    .body(user.getFotoUrl());
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 }

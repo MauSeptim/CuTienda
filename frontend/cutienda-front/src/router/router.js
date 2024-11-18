@@ -14,12 +14,12 @@ const routes = [
     redirect: '/login'
   },
   {
-    path: '/productos/:email',
+    path: '/productos/:id',
     name: 'Productos',
     component: PaginaProductos
   },
   {
-    path: '/usuario/:email',
+    path: '/usuario/:id',
     name: 'Usuario',
     component: PaginaUsuario
   },
@@ -34,7 +34,7 @@ const routes = [
     component: PaginaCrearCuenta
   },
   {
-    path: '/notificaciones/:email',
+    path: '/notificaciones/:id',
     name: 'Notificaciones',
     component: Notificacion
   },

@@ -6,17 +6,16 @@
 
     <div class="container">
       <div class="profile-section">
-        <img :src="usuario.fotoUrl" alt="Imagen de Perfil" class="profile-image" id="fotoUrl">
+        <img :src="usuario.fotoUrlBase64" alt="Imagen de Perfil" class="profile-image" id="fotoUrl">
         <h2>{{ usuario.nombre }} {{ usuario.apellidos }}</h2>
         <p>{{ usuario.correoElectronico }}</p>
         <p>{{ usuario.telefono }}</p>
-        <label for="foto" class="upload-label">Cambiar Imagen</label>
-        <input type="file" id="foto" @change="onFileChange" accept="image/png, image/jpeg" class="upload-input">
       </div>
 
       <div class="actions-section">
         <button @click="editarPerfil" class="action-button">Editar Perfil</button>
         <button @click="verNotificaciones" class="action-button">Ver Notificaciones</button>
+        <button @click="verProductos" class="action-button">Ver Productos</button>
         <button v-if="usuario.tipo === 'admin'" @click="registrarProducto" class="action-button">Registrar Producto</button>
       </div>
     </div>
@@ -54,26 +53,30 @@ export default {
     registrarProducto() {
       this.$router.push({ name: 'RegistrarProducto' , params: { id: this.usuario.id } });
     },
+    verProductos() {
+      this.$router.push({ name: 'Productos' , params: { id: this.usuario.id } });
+    },
     foto() {
       axios.get(`http://localhost:8011/api/cutienda/${this.usuario.id}/foto`)
       .then(response => {
-        this.usuario.fotoUrl = response.data;
-        return response.data;
+        const base64Image = btoa(String.fromCharCode(...new Uint8Array(response.data)));
+        this.usuario.fotoUrl = `data:image/jpeg;base64,${base64Image}`;
       })
       .catch(error => {
         console.error(error);
       });
+      return this.usuarioUrl;
     }
 
   },
   mounted() {
-    const form = new FormData();
-    form.append('email', this.$route.params.email);
-    axios.post("http://localhost:8011/api/cutienda/correo", form)
+    const id = this.$route.params.id;
+    console.log("ID:", id);
+    axios.get(`http://localhost:8011/api/cutienda/${id}`)
     .then(response => {
       this.usuario = response.data;
-      this.foto();
-        console.log("Usuario:", this.usuario);
+      this.foto(); 
+      console.log("Usuario:", this.usuario);
       })
       .catch(error => {
         console.error("Error al obtener el usuario:", error);
@@ -159,6 +162,7 @@ body {
   background-color: #28a745;
   color: #fff;
   border: none;
+  width: 13rem;
   border-radius: 4px;
   cursor: pointer;
   font-size: 16px;
@@ -171,7 +175,7 @@ body {
   box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
 }
 .profile-image img {
-  width: 3rem;
-  height: 3rem;
+  width: 5rem;
+  height: 5rem;
 }
 </style>

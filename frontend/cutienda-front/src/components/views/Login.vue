@@ -108,6 +108,7 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   background-color: #002060; /* Fondo azul */
   color: #fff; /* Texto blanco */
 }
@@ -144,25 +145,32 @@ export default {
 }
 
 .roles {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   margin-bottom: 20px;
 }
 
 .inputs {
-    padding: 20px; 
-    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
 }
 
 .form-group {
   margin-bottom: 15px;
-  padding: 8px;
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  width: 30rem;
   gap: 15px;
 }
 
 .form-group input {
     border-radius: 20px;
     height: 3.0rem;
+    width: 100%;
     font-size: 1.2rem;
 }
 
@@ -174,7 +182,6 @@ export default {
 }
 
 .input-field {
-  width: 100%;
   padding: 10px;
   border-radius: 4px;
   box-sizing: border-box;

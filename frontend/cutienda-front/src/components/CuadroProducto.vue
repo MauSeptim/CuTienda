@@ -58,154 +58,164 @@ onMounted(fetchFoto);
 </script>
 
 <template>
-<div class="container">
-	<div class="table" @click="verComentarios">
-		<div class="table-header">
-			<div class="header__item"><a id="name" class="filter__link" href="#">PRODUCTO</a></div>
-			<div class="header__item"><a id="wins" class="filter__link filter__link--number" href="#">NOMBRE</a></div>
-			<div class="header__item"><a id="draws" class="filter__link filter__link--number" href="#">PRECIO</a></div>
-			<div class="header__item"><a id="losses" class="filter__link filter__link--number" href="#">VENDEDOR</a></div>
-			<div class="header__item"><a id="total" class="filter__link filter__link--number" href="#">DESCRIPCION</a></div>
-		</div>
-		<div class="table-content">	
-			<div class="table-row">		
-				<div class="table-data"><img class="foto" :src="producto.foto" alt=""></div>
-				<div class="table-data">{{ producto.nombreProducto }}</div>
-				<div class="table-data">{{ producto.precio }}</div>
-				<div class="table-data">{{ nombreUsuario }}</div>
-				<div class="table-data">{{producto.descripcion}}</div>
-			</div>
-		</div>	
-	</div>
-</div>
+  <div class="container">
+    <div class="table" @click="verComentarios">
+      <div class="table-header">
+        <div class="header__item"><a id="name" class="filter__link" href="#">PRODUCTO</a></div>
+        <div class="header__item"><a id="wins" class="filter__link filter__link--number" href="#">NOMBRE</a></div>
+        <div class="header__item"><a id="draws" class="filter__link filter__link--number" href="#">PRECIO</a></div>
+        <div class="header__item"><a id="losses" class="filter__link filter__link--number" href="#">VENDEDOR</a></div>
+        <div class="header__item"><a id="total" class="filter__link filter__link--number" href="#">DESCRIPCIÓN</a></div>
+      </div>
+      <div class="table-content">
+        <div class="table-row">
+          <div class="table-data"><img class="foto" :src="producto.foto" alt="Imagen del producto"></div>
+          <div class="table-data">{{ producto.nombreProducto }}</div>
+          <div class="table-data">{{ producto.precio}}</div>
+          <div class="table-data">{{ nombreUsuario }}</div>
+          <div class="table-data">{{ producto.descripcion }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
-<style>
-.foto {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-} 
-/* ---------------------------------------------------------------*/
-@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700');
+<style scoped>
 
 :root {
-    --base-spacing-unit: 24px;
-    --alf-spacing-unit: calc(var(--base-spacing-unit) / 2); /* Usando CSS custom property */
-    
-    --color-alpha: #1772FF;
-    --color-form-highlight: #001a52;
+  --base-spacing-unit: 24px;
+  --alf-spacing-unit: calc(var(--base-spacing-unit) / 2); /* Usando CSS custom property */
+  --color-alpha: #1772FF;
+  --color-form-highlight: #001a52;
 }
 
 .foto {
-    width: 12rem;
-    height: 12rem;
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
 }
 
 *, *:before, *:after {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 body {
-    padding: var(--base-spacing-unit); /* Usando variable */
-    font-family: 'Source Sans Pro', sans-serif;
-    margin: 0;
-}
-
-h1, h2, h3, h4, h5, h6 {
-    margin: 0;
+  padding: var(--base-spacing-unit); /* Usando variable */
+  font-family: 'Source Sans Pro', sans-serif;
+  margin: 0;
 }
 
 .container {
-    max-width: 1000px;
-    width: 63vw;
-    margin-right: auto;
-    margin-left: auto;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    box-shadow: inset;
+  width: 100%;
+  padding: 20px;
 }
 
 .table {
-    width: 100%;
-    border: 1px solid var(--color-form-highlight); /* Usando variable */
-    box-shadow: 30px 28px 20px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #1a1a1a;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
 }
 
-.table:hover .table-header, .table-row{
-    transition: 0.3s ease;
-    background-color: #262626;
-    cursor: pointer;
-}
 .table:hover {
-    transition: 0.3s ease;
-    border: #18ebff 3px solid;
-}
-.table:hover a{
-    transition: 0.9s ease;
-    color: #18ebff;
+  transform: translateY(-10px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 
 .table-header {
-    display: flex;
-    width: 100%;
-    background: #000;
-    padding: calc(var(--alf-spacing-unit) * 1.5) 0; /* Usando variable */
-}
-
-.table-row {
-    display: flex;
-    width: 100%;
-    padding: calc(var(--alf-spacing-unit) * 1.5) 0; /* Usando variable */
-}
-
-.table-row:nth-of-type(odd) {
-    background: var(--color-form-highlight); /* Usando variable */
-}
-
-.table-data, .header__item {
-    flex: 1 1 20%;
-    display: flex;
-    align-items: center ;
-    justify-content: space-around;
-    text-align: center;
-}
-
-.table-data {
-    font-size: 1.5rem;
-    color: white;
+  display: flex;
+  justify-content: space-around;
+  text-align: center;
+  background-color: var(--color-form-highlight);
+  padding: 10px 0;
 }
 
 .header__item {
-    text-transform: uppercase;
+  flex: 1;
+  text-transform: uppercase;
+  font-weight: bold;
+  color: white;
 }
 
 .filter__link {
-    color: white;
-    text-decoration: none;
-    position: relative;
-    display: inline-block;
-    padding-left: var(--base-spacing-unit); /* Usando variable */
-    padding-right: var(--base-spacing-unit); /* Usando variable */
+  color: white;
+  text-decoration: none;
+  position: relative;
+  display: inline-block;
+  padding-left: var(--base-spacing-unit); /* Usando variable */
+  padding-right: var(--base-spacing-unit); /* Usando variable */
 }
 
 .filter__link::after {
-    content: '';
-    position: absolute;
-    right: calc(-1 * var(--alf-spacing-unit) * 1.5); /* Usando variable */
-    color: white;
-    font-size: var(--alf-spacing-unit); /* Usando variable */
-    top: 50%;
-    transform: translateY(-50%);
+  content: '';
 }
 
-.filter__link.desc::after {
-    content: '(desc)';
+.table-content {
+  display: flex;
+  flex-direction: column;
 }
 
-.filter__link.asc::after {
-    content: '(asc)';
+.table-row {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  text-align: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #ccc;
 }
 
+.table-data {
+  flex: 1;
+  font-size: 1.2rem;
+  color: white;
+  word-wrap: break-word; /* Asegura que las palabras no salgan del div */
+}
+
+@media (max-width: 768px) {
+  .table-header, .table-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .header__item, .table-data {
+    text-align: left;
+    padding: 10px 0;
+  }
+
+  .foto {
+    width: 100%;
+    height: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .table-header, .table-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .header__item, .table-data {
+    text-align: left;
+    padding: 10px 0;
+  }
+
+  .table-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .table-data {
+    text-align: left;
+  }
+
+  .foto {
+    grid-column: 1 / -1;
+    width: 100%;
+    height: auto;
+  }
+}
 </style>

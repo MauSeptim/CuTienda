@@ -73,9 +73,12 @@ const notificacion = () => {
 </template>
 
 <style >
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap');
+
 * {
   padding: 0;
   margin: 0;
+  font-family: 'roboto', sans-serif;
 }
 
 body {
@@ -83,13 +86,15 @@ body {
 }
 
 .producto-container {
+  margin: auto auto;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 20px;
+  width: 60%;
 }
 .iter-cuadro {
-  margin-top: 60px;
 }
 
 .navbar-imagen {
@@ -97,21 +102,28 @@ body {
   flex-flow: column ;
   position: relative;
   align-items: center;
+  gap: 20px;
 }
 .navbar-imagen img {
-  width: 12rem;
-  height: 12rem;
+  margin-top: 30px;
+  width: 5rem;
+  height: 5rem;
 }
 .navbar-imagen h1 {
-  margin-top: 5vh;
-  font-size: 3rem;
+  font-size: 3.5rem;
   color: #f5f5f5;
 }
 
 .barra {
   margin: auto;
   position: relative;
-  margin-top: 10vh;
+  height: 1rem;
+  width: 54%;
+  margin-top: 3rem;
+  margin-bottom: 7rem;
+}
+.barra div input {
+  font-size: 2px;
 }
 
 .botones-superiores {
@@ -121,7 +133,11 @@ body {
   display: flex;
   gap: 10px;   /* Espacio entre los botones */
   margin: 20px; /* Margen para separarlos un poco del borde */
-
 }
+.botones-superiores button {
+  font-size: 1.2rem;
+  padding: 1rem;
+}
+
 
 </style>

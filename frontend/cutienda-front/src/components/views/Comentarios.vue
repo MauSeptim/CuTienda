@@ -4,8 +4,8 @@
             <img :src="producto.fotoBase64" alt="Imagen del producto" class="product-image" />
             <h2>{{ producto.nombre }}</h2>
             <p>{{ producto.descripcion }}</p>
-            <button @click="openGoogleMaps" class="maps-button"> 
-                Ver en Google Maps
+            <button @click="openGoogleMaps" class="maps-button">
+                <i class="fas fa-map-marker-alt"></i> Ver en Google Maps
             </button>
         </div>
         <div class="comments-section">
@@ -15,10 +15,11 @@
                 <div class="rating">
                     <span v-for="star in 5" :key="star" class="star" :class="{ filled: star <= comentario.calificacion }">★</span>
                 </div>
-                <p class="comment-date">{{ comentario.fechaCreacion }}</p>
+                <p class="comment-date">{{ formatFecha(comentario.fechaCreacion) }}</p>
             </div>
-            <div v-if="!isProductOwner" class="add-comment">
-                <textarea v-model="nuevoComentario.contenido" placeholder="Escribe tu comentario"></textarea>
+            <div v-if="!isProductOwner && !yaComento" class="add-comment">
+                <textarea v-model="nuevoComentario.contenido" placeholder="Escribe tu comentario">
+                </textarea>
                 <div class="rating">
                     <span v-for="star in 5" :key="star" class="star" :class="{ filled: star <= nuevoComentario.calificacion }" @click="setRating(star)">★</span>
                 </div>
@@ -29,7 +30,10 @@
 </template>
 
 <script>
-import axios from 'axios';
+import axios from "axios";
+import Swal from "sweetalert2";
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
 
 export default {
     name: 'Comentarios',
@@ -45,13 +49,30 @@ export default {
                 contenido: '',
                 calificacion: 0
             },
-            idUsuario: null,
-            idVendedor: null,
             idProducto: null,
-            isProductOwner: false
+            idUsuario: null, // Aquí deberías obtener el ID del usuario autenticado
+            isProductOwner: false,
+            yaComento: false
         };
     },
+    computed: {
+        promedioEstrellas() {
+            if (this.comentarios.length === 0) return 0;
+            const totalEstrellas = this.comentarios.reduce((sum, comentario) => sum + comentario.calificacion, 0);
+            return totalEstrellas / this.comentarios.length;
+        }
+    },
     methods: {
+        openGoogleMaps() {
+            const { latitud, longitud } = this.producto;
+            window.open(`https://www.google.com/maps?q=${latitud},${longitud}`, '_blank');
+        },
+        setRating(star) {
+            this.nuevoComentario.calificacion = star;
+        },
+        formatFecha(fecha) {
+            return format(new Date(fecha), "dd 'de' MMMM 'del' yyyy 'a las' hh:mm a", { locale: es });
+        },
         fetchProducto() {
             axios.get(`http://localhost:8010/cutienda/api/productos/${this.idProducto}`)
                 .then(response => {
@@ -60,32 +81,41 @@ export default {
                 });
         },
         fetchComentarios() {
-            axios.get(`http://localhost:8013/cutienda2/comentarios/${this.idVendedor}${this.idProducto}`)
+            const id = +`${this.idVendedor}${this.idProducto}`;
+            axios.get(`http://localhost:8013/cutienda2/comentarios/${id}`)
                 .then(response => {
                     this.comentarios = response.data;
+                    console.log(this.comentarios);
+                    console.log(this.idUsuario);
+                    this.yaComento = this.comentarios.some(({usuario}) => usuario == this.idUsuario);
                 });
         },
         guardarComentario() {
+            if (this.nuevoComentario.calificacion === 0) {
+                Swal.fire('Error', 'Por favor, elige al menos una estrella para calificar.', 'error');
+                return;
+            }
+
             const comentario = {
-                vendedor: `${this.idVendedor}${this.idProducto}`,
-                usuario: this.idUsuario, // Aquí deberías obtener el ID del usuario autenticado
+                vendedor: +`${this.idVendedor}${this.idProducto}`,
+                usuario: this.idUsuario,
                 contenido: this.nuevoComentario.contenido,
                 calificacion: this.nuevoComentario.calificacion,
                 fechaCreacion: new Date().toISOString()
             };
+
             axios.post('http://localhost:8013/cutienda2/comentarios/guardar', comentario)
-                .then(() => {
-                    this.fetchComentarios();
+                .then(response => {
+                    this.comentarios.push(response.data);
                     this.nuevoComentario.contenido = '';
                     this.nuevoComentario.calificacion = 0;
+                    this.yaComento = true;
+                    this.$router.go(0);
+                })
+                .catch(error => {
+                    console.error('Error al guardar el comentario:', error);
+                    Swal.fire('Error', 'Error al guardar el comentario', 'error');
                 });
-        },
-        setRating(star) {
-            this.nuevoComentario.calificacion = star;
-        },
-        openGoogleMaps() {
-            const { latitud, longitud } = this.producto;
-            window.open(`https://www.google.com/maps?q=${latitud},${longitud}`, '_blank');
         }
     },
     created() {
@@ -114,6 +144,7 @@ body {
     flex-direction: column;
     align-items: center;
     padding: 20px;
+    gap: 3.5rem;
 }
 
 .product-info {
@@ -148,7 +179,7 @@ body {
 }
 
 .maps-button i {
-    font-size: 18px;
+    font-size: 1rem;
 }
 
 .maps-button:hover {
@@ -164,7 +195,7 @@ body {
 
 .comments-section h3 {
     margin-bottom: 20px;
-    font-size: 24px;
+    font-size: 2.2em;
     font-weight: bold;
 }
 
@@ -185,7 +216,7 @@ body {
 }
 
 .star {
-    font-size: 20px;
+    font-size: 1em;
     color: #ccc;
 }
 
@@ -194,7 +225,7 @@ body {
 }
 
 .comment-date {
-    font-size: 12px;
+    font-size: 0.8em;
     color: #aaa;
 }
 
@@ -209,6 +240,7 @@ body {
     border: 1px solid #ccc;
     background-color: #f9f9f9;
     color: #333;
+    font-size: 1rem;
     margin-bottom: 10px;
 }
 

@@ -99,6 +99,9 @@ h1 {
 }
 
 .page-wrapper {
+  display: flex;
+  flex-flow: column;
+  gap: 2rem;
   width: 50%;
   height: 100%;
 }
@@ -107,7 +110,7 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: left;
-  margin-bottom: 20px;
+  margin-top: 2.4rem;
 }
 
 .encabezado span {
@@ -119,7 +122,6 @@ h1 {
 .notificaciones {
   width: 100%;
   background-color: #fff;
-  padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   color: #333; /* Texto oscuro dentro del contenedor */

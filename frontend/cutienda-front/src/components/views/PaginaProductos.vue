@@ -7,6 +7,7 @@ import axios from 'axios';
 import CuadroProducto from '../CuadroProducto.vue';
 import { useRouter } from 'vue-router';
 import { onMounted } from 'vue';
+import { onBeforeRouteLeave } from 'vue-router';
 
 let productos = ref([]);
 const router = useRouter()
@@ -16,12 +17,21 @@ onMounted(() => {
   idUsuario.value = router.currentRoute.value.params.id;
 });
 
+
+const borrarProductos = () => {
+  productos.value = [];
+};
+
+onBeforeRouteLeave(() => {
+  borrarProductos();
+});
+
 // Función para buscar productos en la API
 const buscarProductos = async (query) => {
   try {
 
     if (productos.value.length > 0) {
-      productos.value = [];
+      borrarProductos();
     } 
 
     const url = query 
@@ -94,8 +104,6 @@ body {
   gap: 20px;
   width: 60%;
 }
-.iter-cuadro {
-}
 
 .navbar-imagen {
   display: flex;
@@ -106,8 +114,8 @@ body {
 }
 .navbar-imagen img {
   margin-top: 30px;
-  width: 5rem;
-  height: 5rem;
+  width: 8rem;
+  height: 8rem;
 }
 .navbar-imagen h1 {
   font-size: 3.5rem;

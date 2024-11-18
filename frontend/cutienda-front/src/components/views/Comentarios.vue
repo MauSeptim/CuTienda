@@ -202,7 +202,8 @@ body {
 .comment {
     background-color: #1a1a1a;
     padding: 15px;
-    border-radius: 8px;
+    width: 100%;
+    border-radius: 4px;
     margin-bottom: 15px;
 }
 
@@ -235,7 +236,7 @@ body {
 
 .add-comment textarea {
     width: 100%;
-    padding: 10px;
+    padding: 15px;
     border-radius: 4px;
     border: 1px solid #ccc;
     background-color: #f9f9f9;

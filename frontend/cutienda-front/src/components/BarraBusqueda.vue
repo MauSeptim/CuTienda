@@ -52,7 +52,7 @@ const onBuscarClick = () => {
     border: none;
     padding: 10px 30px;
     background: transparent;
-    font-weight: 500;
+    font-weight: 400;
 }
 
 .search {

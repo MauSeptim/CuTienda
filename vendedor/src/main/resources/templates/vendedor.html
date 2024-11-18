@@ -6,29 +6,34 @@
   <title>Vista Cliente - CUT-TIENDA</title>
   <style>
     body {
-        font-family: Arial, sans-serif;
-        background-color: #001848;
-        color: white;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        margin: 0;
-    }
-    .container {
-        background-color: #001848;
-        border-radius: 15px;
-        width: 550px;
-        padding: 20px;
-        margin-top: 30px;
-        text-align: center;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
+    font-family: Arial, sans-serif;
+    background-color: #001848;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Cambiado para alinear al inicio */
+    height: 100vh;
+    margin: 0;
+    padding-top: 20px; /* Espacio superior para dar margen al contenedor */
+}
+
+.container {
+    background-color: #001848;
+    border-radius: 15px;
+    width: 550px;
+    max-height: 90vh; /* Altura máxima del contenedor */
+    overflow-y: auto; /* Habilita el scroll vertical */
+    padding: 20px;
+    margin-top: 30px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
     .header {
         display: flex;
         justify-content: center;
         align-items: center;
-        margin-top: 40px;
+        margin-top: 20px;
     }
     .header img {
         width: 400px;
@@ -80,9 +85,24 @@
         margin-top: 15px;
     }
     .rating span {
-        font-size: 2em;
-        color: gold;
+        font-size: 30px;
+        color: lightgray;  /* Color por defecto para estrellas vacías */
     }
+
+    .filled {
+        color: gold;  /* Color dorado para la estrella llena */
+    }
+
+    .half-filled {
+        background: linear-gradient(to left, gold 50%, lightgray 50%);
+        color: transparent;  /* Esto asegura que solo el fondo sea dorado */
+        -webkit-background-clip: text;  /* Para que el fondo dorado se aplique solo al texto */
+    }
+
+    .empty {
+        color: lightgray;  /* Color para las estrellas vacías */
+    }
+
     .buttons {
         margin-top: 15px;
     }
@@ -105,48 +125,52 @@
 <div class="container">
   <!-- Header con logo centrado -->
   <div class="header">
-    <img th:src="@{/images/logo.png}" alt="CUT-TIENDA Logo">
+    <img th:src="@{/logo.png}" alt="CUT-TIENDA Logo">
   </div>
 
   <div class="subtitle">CUT-TIENDA</div>
 
   <div class="profile-info">
     <!-- Foto del vendedor -->
-    <img th:src="@{/capi.jpeg}" alt="Foto del Vendedor">
+    <img th:src="${vendedor.fotoUrlBase64}" alt="Foto del Vendedor">
 
     <!-- Mapa que abre Google Maps al hacer clic -->
-    <img th:src="@{/map.jpeg}" alt="Ver en Google Maps" class="map-img" onclick="openGoogleMaps()">
+    <!-- Imagen de mapa que redirige a Google Maps -->
+    <img th:src="@{/map.jpeg}" alt="Ver en Google Maps" class="map-img"
+         th:onclick="'window.open(\'https://www.google.com/maps?q=' + ${producto.latitud} + ',' + ${producto.longitud} + '\', \'_blank\')'">
+
   </div>
 
-  <div class="details">
+  <div th:if="${vendedor != null}" class="details">
     <label>Vendedor:</label>
-    <!-- Comentada para que no genere error -->
-    <input type="text" th:value="${vendedor.nombre}" readonly> -->
-    <input type="text" value="Nombre Vendedor" readonly>
+    <input type="text" th:value="${vendedor.nombre}" readonly>
+    <input type="text" th:value="${vendedor.apellidos}" readonly>
     <label>Número:</label>
-    <!-- Comentada para que no genere error -->
-    <!-- <input type="text" th:value="${vendedor.telefono}" readonly> -->
-    <input type="text" value="123456789" readonly>
+    <input type="text" th:value="${vendedor.telefono}" readonly>
     <label>Correo electrónico:</label>
-    <!-- Comentada para que no genere error -->
-    <!-- <input type="text" th:value="${vendedor.correo_electronico}" readonly> -->
-    <input type="text" value="vendedor@correo.com" readonly>
+    <input type="text" th:value="${vendedor.correo_electronico}" readonly>
   </div>
 
   <div class="characteristics">
     <label>Comentarios:</label>
-    <!-- Comentada para que no genere error -->
-    <!-- <div th:each="comentario : ${comentarios}"> -->
-    <textarea rows="3" readonly>Comentario de ejemplo</textarea>
-    <!-- </div> -->
+    <!-- Itera sobre los comentarios -->
+    <div th:each="comentario : ${comentarios}">
+      <textarea rows="3" readonly th:text="${comentario.contenido}">Comentario de ejemplo</textarea>
+    </div>
   </div>
 
-  <div class="rating">
-    <!-- Comentada para que no genere error -->
-    <!-- <span th:each="comentario : ${comentarios}"> -->
-    <!-- <span th:each="starStat : ${#numbers.sequence(1, comentario.calificacion)}">⭐</span> -->
-    <!-- </span> -->
-    <span>⭐⭐⭐⭐⭐</span>
+  <div class="rating" id="rating">
+    <!-- Las estrellas se llenarán dinámicamente con el promedio de calificación -->
+    <span class="star" data-value="1">⭐</span>
+    <span class="star" data-value="2">⭐</span>
+    <span class="star" data-value="3">⭐</span>
+    <span class="star" data-value="4">⭐</span>
+    <span class="star" data-value="5">⭐</span>
+  </div>
+
+  <!-- Si no se encuentra el vendedor, mostrar un mensaje de error -->
+  <div th:if="${vendedor == null}">
+    <p th:text="'Vendedor no encontrado con ID: ' + ${error}"></p>
   </div>
 
   <div class="buttons">
@@ -156,17 +180,40 @@
 </div>
 
 <script>
-  function openGoogleMaps() {
-      if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition((position) => {
-              const latitude = position.coords.latitude;
-              const longitude = position.coords.longitude;
-              window.open(`https://www.google.com/maps?q=${latitude},${longitude}`, '_blank');
-          }, () => {
-              alert("No se pudo obtener tu ubicación.");
-          });
+  // Obtener el valor de la calificación promedio desde Thymeleaf
+var promedioCalificacion = [[${promedioCalificacion}]];
+console.log("Promedio calificación:", promedioCalificacion);
+
+document.addEventListener("DOMContentLoaded", function() {
+    var promedioCalificacion = parseFloat(promedioCalificacion); // Convertir a decimal por si es necesario
+    var fullStars = Math.floor(promedioCalificacion);
+    var hasHalfStar = promedioCalificacion % 1 >= 0.5;
+    var stars = document.querySelectorAll('#rating .star');
+
+    stars.forEach(function(star, index) {
+        star.classList.remove('filled', 'half-filled', 'empty'); // Limpiar clases
+
+        if (index < fullStars) {
+            star.classList.add('filled'); // Estrella llena
+        } else if (index === fullStars && hasHalfStar) {
+            star.classList.add('half-filled'); // Media estrella
+        } else {
+            star.classList.add('empty'); // Estrella vacía
+        }
+    });
+});
+
+</script>
+<script>
+  function openGoogleMaps(lat, lng) {
+      // Verifica si las coordenadas son válidas
+      if (lat && lng) {
+          // Crea la URL de Google Maps
+          const url = `https://www.google.com/maps?q=${lat},${lng}`;
+          // Abre Google Maps en una nueva pestaña
+          window.open(url, '_blank');
       } else {
-          alert("La geolocalización no está soportada por tu navegador.");
+          alert('Las coordenadas no son válidas');
       }
   }
 </script>

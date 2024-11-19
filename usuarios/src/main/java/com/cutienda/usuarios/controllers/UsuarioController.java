@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -177,32 +178,44 @@ public class UsuarioController {
         }
         return ResponseEntity.ok(response);
     }
-
-    // Endpoint para actualizar perfil
-    @PostMapping("/perfil/actualizar")
-    public ResponseEntity<Map<String, String>> actualizarPerfil(
-            @RequestParam("nombre") String nombre,
-            @RequestParam("apellidos") String apellidos,
-            @RequestParam("correoElectronico") String correoElectronico,
-            @RequestParam("telefono") String telefono,
-            @RequestParam(required = false) String nuevaContraseña,
-            @RequestParam(required = false) String confirmacionContraseña,
-            @RequestParam(required = false) MultipartFile foto,
-            HttpSession session) {
+    @PostMapping("/perfil/actualizar/{id}")
+    public ResponseEntity<Object> actualizarPerfil(
+            @PathVariable Long id,
+            @RequestParam(value = "nombre", required = false) String nombre,
+            @RequestParam(value = "apellidos", required = false) String apellidos,
+            @RequestParam(value = "correoElectronico", required = false) String correoElectronico,
+            @RequestParam(value = "telefono", required = false) String telefono,
+            @RequestParam(required = false, value = "newPassword") String nuevaContraseña,
+            @RequestParam(required = false, value = "passwordConfirm") String confirmacionContraseña,
+            @RequestParam(required = false, value = "foto") MultipartFile foto) {
 
         Map<String, String> response = new HashMap<>();
+
+        // Buscar el usuario en la base de datos
+        Optional<Usuario> optionalUsuario = usuarioService.buscarPorId(id);
+        if (!optionalUsuario.isPresent()) {
+            response.put("error", "Usuario no encontrado.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+
+        Usuario usuario = optionalUsuario.get();
+
         try {
-            Usuario usuario = (Usuario) session.getAttribute("usuario");
-            if (usuario == null || usuario.getId() == null) {
-                response.put("error", "Debes iniciar sesión para actualizar tu perfil.");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            // Actualizar datos del usuario si están presentes
+            if (nombre != null && !nombre.isEmpty()) {
+                usuario.setNombre(nombre);
+            }
+            if (apellidos != null && !apellidos.isEmpty()) {
+                usuario.setApellidos(apellidos);
+            }
+            if (correoElectronico != null && !correoElectronico.isEmpty()) {
+                usuario.setCorreoElectronico(correoElectronico);
+            }
+            if (telefono != null && !telefono.isEmpty()) {
+                usuario.setTelefono(telefono);
             }
 
-            usuario.setNombre(nombre);
-            usuario.setApellidos(apellidos);
-            usuario.setCorreoElectronico(correoElectronico);
-            usuario.setTelefono(telefono);
-
+            // Validar y actualizar contraseña si es necesario
             if (nuevaContraseña != null && !nuevaContraseña.isEmpty()) {
                 if (!nuevaContraseña.equals(confirmacionContraseña)) {
                     response.put("error", "Las contraseñas no coinciden.");
@@ -211,14 +224,19 @@ public class UsuarioController {
                 usuario.setContraseña(nuevaContraseña);
             }
 
+            // Procesar y guardar la foto si está presente
             if (foto != null && !foto.isEmpty()) {
                 byte[] imagenBytes = foto.getBytes();
                 usuario.setFotoUrl(imagenBytes);
             }
 
+            // Guardar los cambios en la base de datos
             usuarioService.actualizarUsuario(usuario);
-            session.setAttribute("usuario", usuario);
 
+            System.out.println(nuevaContraseña);
+            System.out.println(confirmacionContraseña);
+            System.out.println(usuario.getId());
+            System.out.println(usuario.getContraseña());
             response.put("message", "Perfil actualizado con éxito.");
             return ResponseEntity.ok(response);
 
@@ -230,6 +248,7 @@ public class UsuarioController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
+
     @GetMapping("/{id}")
     public ResponseEntity<Object> ObtenerUsuarioPorId(@PathVariable Long id) {
         Usuario user = usuarioService.buscarPorId(id).orElse(null);

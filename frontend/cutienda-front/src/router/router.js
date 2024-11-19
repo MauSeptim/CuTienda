@@ -8,6 +8,7 @@ import Login from '@/components/views/Login.vue'
 import Notificacion from '@/components/views/Notificacion.vue'
 import RegistrarProducto from '@/components/views/RegistrarProducto.vue'
 import Comentarios from '@/components/views/Comentarios.vue'
+import ActualizarPerfil from '@/components/views/ActualizarPerfil.vue'
 
 const routes = [
   {
@@ -45,9 +46,14 @@ const routes = [
     component: RegistrarProducto
   },
   {
-    path: '/comentarios/:id_vendedor/:id_producto/:user_id',
+    path: '/comentarios/vendedor?=:id_vendedor/prod?=:id_producto/user?=:user_id',
     name : 'Comentarios',
     component: Comentarios
+  },
+  {
+    path: '/actualizar-perfil/:id',
+    name : 'ActualizarPerfil',
+    component: ActualizarPerfil
   }
   // Puedes añadir más rutas aquí
 ]

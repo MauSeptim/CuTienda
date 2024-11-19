@@ -27,10 +27,11 @@
         <input type="file" id="foto" @change="onFileChange" />
       </div>
       <div class="actions">
+        <button type="button" @click="cancelar" class="cancel-button">Cancelar</button>
         <button
-          type="button"
-          @click="getLocation"
-          class="location-button"
+        type="button"
+        @click="getLocation"
+        class="location-button"
           :class="{ active: ubicacionObtenida }"
           :disabled="ubicacionObtenida"
         >
@@ -74,6 +75,9 @@ export default {
       } else {
         Swal.fire("Error", "Geolocalización no es soportada por este navegador.", "error");
       }
+    },
+    cancelar() {
+      this.$router.go(-1);
     },
     setPosition(position) {
       this.product.latitud = position.coords.latitude;
@@ -207,6 +211,7 @@ textarea {
 }
 
 .actions {
+  margin-top: 2.5rem;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
@@ -233,6 +238,10 @@ button {
 
 .submit-button {
   background: #28a745;
+  color: white;
+}
+.cancel-button {
+  background: #dc3545;
   color: white;
 }
 

@@ -39,7 +39,7 @@ export default {
   },
   methods: {
     editarPerfil() {
-      this.$router.push({ name: "EditarPerfil", params: { id: this.usuario.id } });
+      this.$router.push({ name: "ActualizarPerfil", params: { id: this.usuario.id } });
     },
     verNotificaciones() {
       this.$router.push({ name: "Notificaciones", params: { id: this.usuario.id } });

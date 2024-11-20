@@ -12,6 +12,7 @@ import { onBeforeRouteLeave } from 'vue-router';
 let productos = ref([]);
 const productosCache = ref([]); // Cache de productos
 const isLoading = ref(false); // Estado de carga
+let limpiarSugerencias = ref(false);
 const router = useRouter();
 const idUsuario = ref('');
 
@@ -44,6 +45,8 @@ const buscarProductos = async (query) => {
       : 'http://localhost:8010/cutienda/api/productos';
 
     // Hacer la solicitud a la API
+    limpiarSugerencias.value = true; // Limpiar sugerencias
+
     const response = await axios.get(url);
     productos.value = response.data; // Actualizar la lista de productos
     productosCache.value = response.data; // Guardar en caché
@@ -52,6 +55,8 @@ const buscarProductos = async (query) => {
     alert('No se pudo obtener los productos.');
     console.error(error);
   } finally {
+    limpiarSugerencias.value = false; // Reiniciar estado
+
     isLoading.value = false; // Ocultar indicador de carga
   }
 };
@@ -90,7 +95,7 @@ const notificacion = () => {
       <boton :texto="'Perfil'" @click="aPerfil" />
     </div>
 
-    <BarraBusqueda class="barra" @buscar-productos="buscarProductos" />
+    <BarraBusqueda class="barra" @buscar-productos="buscarProductos" :limpiarSugerencias="limpiarSugerencias"/>
 
     <!-- Indicador de carga -->
     <div v-if="isLoading" class="loading">
@@ -159,7 +164,7 @@ body {
   height: 1rem;
   width: 54%;
   margin-top: 3rem;
-  margin-bottom: 7rem;
+  margin-bottom: 5rem;
 }
 
 /* Indicador de carga */

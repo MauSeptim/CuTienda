@@ -29,20 +29,6 @@ let fetchFoto = () => {
         Swal.fire('Error', 'Error al obtener el nombre del usuario', 'error');
         console.error(error);
     });
-    // Verificar que el ID del producto está definido antes de hacer la solicitud
-    if (producto.value && producto.value.id_producto) {
-        axios.get(`http://localhost:8010/cutienda/api/productos/foto/${producto.value.id_producto}`, { responseType: 'arraybuffer' })
-        .then((response) => {
-            // Convertir los datos binarios en base64 para que pueda mostrarse en la imagen
-            const base64Image = btoa(String.fromCharCode(...new Uint8Array(response.data)));
-            producto.value.foto = `data:image/jpeg;base64,${base64Image}`;
-        }).catch((error) => {
-            console.error("Error al obtener la foto:", error);
-        });
-    } else {
-        console.error("El ID del producto no está definido.");
-    }
-
 };
 
 const verComentarios = () => {
@@ -69,7 +55,7 @@ onMounted(fetchFoto);
       </div>
       <div class="table-content">
         <div class="table-row">
-          <div class="table-data"><img class="foto" :src="producto.foto" alt="Imagen del producto"></div>
+          <div class="table-data"><img class="foto" :src="producto.fotoBase64" alt="Imagen del producto"></div>
           <div class="table-data">{{ producto.nombreProducto }}</div>
           <div class="table-data">{{ producto.precio}}</div>
           <div class="table-data">{{ nombreUsuario }}</div>

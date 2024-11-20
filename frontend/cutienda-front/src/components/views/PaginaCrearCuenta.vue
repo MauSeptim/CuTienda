@@ -131,6 +131,7 @@ export default {
       form.append("foto", this.formData.foto);
 
 
+      const rol = this.formData.role === 'admin' ? 'vendedor' : 'usuario';
       axios.post('http://localhost:8011/api/cutienda/registro', form, {
         headers: {"Content-Type":"multipart/form-data"}
       })
@@ -138,8 +139,8 @@ export default {
         Swal.fire('Éxito', 'Cuenta creada exitosamente', 'success');
         axios.post('http://localhost:8012/api/notificaciones', {
           idUsuario: response.data.message.id,
-          mensaje: `${this.formData.nombre} ${this.formData.apellidos} se ha registrado en Cutienda como nuevo vendedor, echale un vistazo a su catalogo.`,
-          categoria: 'Un vendedor se une a la familia Cutienda!',
+          mensaje: `${this.formData.nombre} ${this.formData.apellidos} se ha registrado en Cutienda como ${rol}`,
+          categoria: `🎉🎉¡Un nuevo integrante se une a la familia de Cutienda!🎉🎉`,
           fecha: new Date().toISOString(),
           leido: false
         })

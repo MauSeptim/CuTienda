@@ -132,6 +132,13 @@ export default {
         await axios.post("http://localhost:8010/cutienda/api/productos/registro", form, {
           headers: { "Content-Type": "multipart/form-data" },
         });
+        axios.post('http://localhost:8012/api/notificaciones', {
+          idUsuario: this.product.id_usuario,
+          mensaje: `Se ha registrado el producto ${this.product.nombre_producto} en Cutienda, revisa el catálogo.`,
+          categoria: '¡Nuevo producto a la venta en Cutienda! 😎',
+          fecha: new Date().toISOString(),
+          leido: false
+        })
         Swal.fire("Éxito", "Producto registrado con éxito", "success");
       } catch (error) {
         console.error("Error al registrar el producto:", error);

@@ -41,8 +41,8 @@
             />
           </div>
           <div class="bottom-buttons">
-            <button type="submit" class="button">INICIAR SESIÓN</button>
-            <button @click="crearCuenta" class="button">CREAR CUENTA</button>
+            <button type="submit" class="button">Iniciar Sesión</button>
+            <button @click="crearCuenta" class="button alt">Crear Cuenta</button>
           </div>
         </form>
       </div>
@@ -78,25 +78,15 @@ export default {
     async submitForm() {
       const form = new FormData();
       form.append('email', this.formData.email);
-      form.append('password', this.formData.password); 
+      form.append('password', this.formData.password);
       form.append('role', this.formData.role);
       
       try {
         const response = await axios.post('http://localhost:8011/api/cutienda/login', form);
-         // Manejar la respuesta exitosa aquí
-         console.log(response.data.usuario);
-         Swal.fire('Éxito', 'Inicio de sesión exitoso', 'success');
-         this.$router.push({name: 'Usuario', params: {id: response.data.usuario.id}});
-         console.log("Despues de hacer la llamada");
-      }
-      catch(error) {
-        if (error.response) {
-          console.error(error.response.data);
-          Swal.fire('Error', error.response.data.error || 'Error durante la autenticación', 'error');
-        } 
-        else {
-          Swal.fire('Error','Error durante la autenticación', 'error');
-        } 
+        Swal.fire('Éxito', 'Inicio de sesión exitoso', 'success');
+        this.$router.push({ name: 'Usuario', params: { id: response.data.usuario.id } });
+      } catch (error) {
+        Swal.fire('Error', error.response?.data?.error || 'Error durante la autenticación', 'error');
       }
     }
   }
@@ -104,134 +94,160 @@ export default {
 </script>
 
 <style scoped>
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 .padre {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  background-color: #002060; /* Fondo azul */
-  color: #fff; /* Texto blanco */
+  color: #fff;
+  height: 100vh;
+  background: linear-gradient(135deg, #002060, #004d99); /* Gradiente azul */
+  padding: 20px;
 }
 
 .encabezado img {
-    width: 9rem;
-    height: 9rem;
+  gap: 1259px;
+  margin-top: 40px;
+  width: 7rem;
+  height: 7rem;
 }
+
 .encabezado {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 40px;
   flex-direction: column;
-  margin-bottom: 20px;
+  gap: 15px;
+  margin-bottom: 30px;
 }
 
 .encabezado span {
-  font-size: 24px;
+  font-size: 28px;
   font-weight: bold;
-  margin-left: 10px;
+  text-align: center;
 }
 
 .container {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
   width: 100%;
-  max-width: 600px;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  color: #333; /* Texto oscuro dentro del contenedor */
-  gap: 10px;
+  max-width: 500px;
+  padding: 25px;
+  border-radius: 16px;
+  background-color: #ffffff;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  color: #333;
 }
 
 .roles {
   display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: space-around;
   margin-bottom: 20px;
 }
 
 .inputs {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
+  display: flex;
+  flex-direction: column;
 }
 
 .form-group {
-  margin-bottom: 15px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  width: 30rem;
-  gap: 15px;
-}
-
-.form-group input {
-    border-radius: 20px;
-    height: 3.0rem;
-    width: 100%;
-    font-size: 1.2rem;
+  margin-bottom: 20px;
 }
 
 .form-group label {
   display: block;
-  margin-bottom: 5px;
+  margin-bottom: 8px;
   font-weight: bold;
-  color: #f9f9f9; /* Texto blanco */
+  color: #333;
 }
 
 .input-field {
-  padding: 10px;
-  border-radius: 4px;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
   box-sizing: border-box;
+  transition: all 0.3s ease-in-out;
+}
+
+.input-field:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 6px rgba(0, 123, 255, 0.25);
+  outline: none;
 }
 
 .bottom-buttons {
   display: flex;
-  justify-content: center;
-  margin-top: 35px;
-  gap: 30px;
+  justify-content: space-between;
+  gap: 15px;
 }
 
 .button {
-  padding: 10px 20px;
+  padding: 12px 18px;
   background-color: #28a745; /* Verde */
   color: #fff;
   border: none;
-  border-radius: 9px;
+  border-radius: 12px;
   cursor: pointer;
   font-size: 16px;
+  transition: background-color 0.3s ease-in-out, transform 0.2s;
+}
+
+.button.alt {
+  background-color: #007bff; /* Azul */
 }
 
 .button:hover {
-  background-color: #218838;
+  transform: translateY(-2px);
 }
+
+.button:active {
+  transform: translateY(0);
+}
+
 @media (max-width: 480px) {
-  .encabezado {
-    flex-direction: column;
-    text-align: center;
+  .container {
+    padding: 15px;
   }
 
-  .encabezado span {
-    font-size: 18px;
-  }
-
-  .roles {
+  .form-group {
     margin-bottom: 15px;
   }
 
-  .form-group label {
-    font-size: 14px;
-  }
-
-  .input-field {
-    padding: 8px;
+  .bottom-buttons {
+    flex-direction: column;
+    gap: 10px;
   }
 
   .button {
-    font-size: 12px;
-    padding: 6px 12px;
+    width: 100%;
   }
 }
+@media (min-width: 1920px) {
+  .padre {
+    padding: 40px;
+    background: linear-gradient(135deg, #001840, #002f70); /* Gradiente más oscuro */
+  }
+
+  .container {
+    max-width: 800px;
+  }
+
+  .form-group input {
+    font-size: 1.5rem;
+    height: 3.5rem;
+  }
+
+  .button {
+    font-size: 18px;
+    padding: 12px 24px;
+  }
+}
+
 </style>

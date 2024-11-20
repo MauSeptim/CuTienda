@@ -232,6 +232,7 @@ body {
 
 .add-comment {
     margin-top: 20px;
+    width: 100%;
 }
 
 .add-comment textarea {

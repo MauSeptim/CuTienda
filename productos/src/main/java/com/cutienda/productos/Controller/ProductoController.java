@@ -46,7 +46,7 @@ public class ProductoController {
 
     // Registrar un nuevo producto
     @PostMapping("/registro")
-    public ResponseEntity<String> registrarProducto(
+    public ResponseEntity<Object> registrarProducto(
             @RequestParam("nombre_producto") String nombre,
             @RequestParam("id_usuario") int id_usuario,
             @RequestParam("descripcion") String descripcion,
@@ -75,8 +75,8 @@ public class ProductoController {
                 producto.setLongitud(longitud);
             }
 
-            productoService.guardarProducto(producto);
-            return ResponseEntity.status(HttpStatus.CREATED).body("Producto registrado exitosamente.");
+            ProductoModelo p = productoService.guardarProducto(producto);
+            return ResponseEntity.status(HttpStatus.CREATED).body(p);
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error al registrar el producto: " + e.getMessage());

@@ -129,9 +129,10 @@ export default {
       form.append("foto", this.product.foto);
 
       try {
-        await axios.post("http://localhost:8010/cutienda/api/productos/registro", form, {
+        const productoSubido = await axios.post("http://localhost:8010/cutienda/api/productos/registro", form, {
           headers: { "Content-Type": "multipart/form-data" },
         });
+        console.log(productoSubido);
         axios.post('http://localhost:8012/api/notificaciones', {
           idUsuario: this.product.id_usuario,
           mensaje: `Se ha registrado el producto ${this.product.nombre_producto} en Cutienda, revisa el catálogo.`,
@@ -140,6 +141,8 @@ export default {
           leido: false
         })
         Swal.fire("Éxito", "Producto registrado con éxito", "success");
+        const id = this.product.id_usuario;
+        this.$router.push({name: `Comentarios`, params: {id_vendedor: id, id_producto: productoSubido.data.id_producto, user_id: id}});
       } catch (error) {
         console.error("Error al registrar el producto:", error);
         Swal.fire("Error", "Error al registrar el producto", "error");

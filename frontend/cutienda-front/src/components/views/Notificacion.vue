@@ -69,7 +69,7 @@ export default {
       return res;
     },
     formatFecha(fecha) {
-      return format(new Date(fecha), "PPP, p", { locale: es });
+      return format(new Date(fecha), "dd 'de' MMMM 'del' yyyy 'a las' hh:mm a", { locale: es });
     },
   },
 };

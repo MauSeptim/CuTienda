@@ -137,7 +137,7 @@ export default {
 
 .sin-notificaciones {
   text-align: center;
-  color: #666;
+  color: #f9f9f9;
   font-size: 1.2rem;
 }
 </style>

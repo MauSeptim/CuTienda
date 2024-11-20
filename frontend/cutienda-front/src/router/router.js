@@ -46,7 +46,7 @@ const routes = [
     component: RegistrarProducto
   },
   {
-    path: '/comentarios/vendedor?=:id_vendedor/prod?=:id_producto/user?=:user_id',
+    path: '/comentarios/:id_vendedor/:id_producto/:user_id',
     name : 'Comentarios',
     component: Comentarios
   },

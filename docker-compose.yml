@@ -1,19 +1,101 @@
-version: '3.8'
+version: '3.1'
 
 services:
-  mysql:
-    image: mysql:8.0 # Puedes cambiar a otra versión si es necesario
-    container_name: mysql_container
+  mariadb:
+    image: mariadb:latest
+    container_name: cutiendaDB
     environment:
-      MYSQL_ROOT_PASSWORD: amadopord1
-      MYSQL_DATABASE: cutienda # Cambia a tu nombre de base de datos si es necesario
-      MYSQL_USER: MYSQL_ROOT_PASSWORD
-      MYSQL_PASSWORD: amadopord1
+      MARIADB_ROOT_PASSWORD: amadopord1
+      MYSQL_DATABASE: cutienda
+      MARIADB_ROOT_PASSWORD_HASH:
+      MARIADB_ALLOW_EMPTY_ROOT_PASSWORD:
+      MARIADB_RANDOM_ROOT_PASSWORD:
     ports:
-      - "3307:3306" # Mapea el puerto para acceder desde tu máquina
-    volumes:
-      - mysql_data:/var/lib/mysql # Persiste los datos en un volumen
-    restart: always # Reinicia automáticamente en caso de fallo
+      - "3307:3306"
+    networks:
+      mariadb_network:
 
-volumes:
-  mysql_data:
+  productos:
+    build:
+      context: productos
+      dockerfile: Dockerfile
+    container_name: productos_service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mariadb://mariadb:3306/cutienda?useSSL=false&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: amadopord1
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.mariadb.jdbc.Driver
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: true
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.MySQLDialect
+    ports:
+      - "8010:8010"  # Mapea el puerto 8010 de tu máquina al puerto 8010 del contenedor Spring Boot
+    depends_on:
+      - mariadb  # Asegura que mariadb esté levantado antes de arrancar el microservicio productos
+    networks:
+      mariadb_network:
+
+  usuarios:
+    build:
+      context: usuarios
+      dockerfile: Dockerfile
+    container_name: usuarios_service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mariadb://mariadb:3306/cutienda?useSSL=false&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: amadopord1
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.mariadb.jdbc.Driver
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: true
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.MySQLDialect
+    ports:
+      - "8011:8011"  # Mapea el puerto 8010 de tu máquina al puerto 8010 del contenedor Spring Boot
+    depends_on:
+      - mariadb  # Asegura que mariadb esté levantado antes de arrancar el microservicio productos
+    networks:
+      mariadb_network:
+
+  notificaciones:
+    build:
+      context: Notificaciones
+      dockerfile: Dockerfile
+    container_name: notificaciones_service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mariadb://mariadb:3306/cutienda?useSSL=false&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: amadopord1
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.mariadb.jdbc.Driver
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: true
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.MySQLDialect
+    ports:
+      - "8012:8012"  # Mapea el puerto 8010 de tu máquina al puerto 8010 del contenedor Spring Boot
+    depends_on:
+      - mariadb  # Asegura que mariadb esté levantado antes de arrancar el microservicio productos
+    networks:
+      mariadb_network:
+
+  comentarios:
+    build:
+      context: ComentariosyValoraciones
+      dockerfile: Dockerfile
+    container_name: comentarios_service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mariadb://mariadb:3306/cutienda?useSSL=false&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: amadopord1
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.mariadb.jdbc.Driver
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: true
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.MySQLDialect
+    ports:
+      - "8013:8013"  # Mapea el puerto 8010 de tu máquina al puerto 8010 del contenedor Spring Boot
+    depends_on:
+      - mariadb  # Asegura que mariadb esté levantado antes de arrancar el microservicio productos
+    networks:
+      mariadb_network:
+
+networks:
+  mariadb_network:
+    driver: bridge
+    external: false

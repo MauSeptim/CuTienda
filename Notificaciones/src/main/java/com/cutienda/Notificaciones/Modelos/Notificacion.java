@@ -8,29 +8,18 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "notificaciones") // Nombre de la tabla en la base de datos
+@Getter
+@Setter
 public class Notificacion {
 
     // Getters y Setters
-    @Setter
-    @Getter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // Genera un ID autoincremental
     private Long id;
-
-    @Setter
-    @Getter
     private int idUsuario;
-    @Setter
-    @Getter
     private String mensaje;
-    @Setter
-    @Getter
     private String categoria;
-    @Setter
-    @Getter
     private LocalDateTime fecha;
-    @Setter
-    @Getter
     private boolean leido;
 
     // Constructor
@@ -39,6 +28,10 @@ public class Notificacion {
         this.mensaje = mensaje;
         this.categoria = categoria;
         this.fecha = fecha;
+        this.leido = leido;
+    }
+
+    public void setLeido(boolean leido) {
         this.leido = leido;
     }
 

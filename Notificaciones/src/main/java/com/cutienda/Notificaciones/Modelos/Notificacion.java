@@ -8,8 +8,6 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "notificaciones") // Nombre de la tabla en la base de datos
-@Getter
-@Setter
 public class Notificacion {
 
     // Getters y Setters
@@ -33,6 +31,50 @@ public class Notificacion {
 
     public void setLeido(boolean leido) {
         this.leido = leido;
+    }
+
+    public void setFecha(LocalDateTime fecha) {
+        this.fecha = fecha;
+    }
+
+    public void setCategoria(String categoria) {
+        this.categoria = categoria;
+    }
+
+    public void setMensaje(String mensaje) {
+        this.mensaje = mensaje;
+    }
+
+    public void setIdUsuario(int idUsuario) {
+        this.idUsuario = idUsuario;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public int getIdUsuario() {
+        return idUsuario;
+    }
+
+    public String getMensaje() {
+        return mensaje;
+    }
+
+    public String getCategoria() {
+        return categoria;
+    }
+
+    public LocalDateTime getFecha() {
+        return fecha;
+    }
+
+    public boolean isLeido() {
+        return leido;
     }
 
     public Notificacion() {

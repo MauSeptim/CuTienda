@@ -95,6 +95,18 @@ services:
     networks:
       mariadb_network:
 
+  frontend:
+    build:
+      context: frontend/cutienda-front
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "80:80"  # Mapea el puerto 8010 de tu máquina al puerto 8010 del contenedor Spring Boot
+    depends_on:
+      - mariadb  # Asegura que mariadb esté levantado antes de arrancar el microservicio productos
+    networks:
+      mariadb_network:
+
 networks:
   mariadb_network:
     driver: bridge

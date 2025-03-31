@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="csrf-token" content="${_csrf.token}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil de Usuario</title>
+    <style>
+        body {
+          color: white;
+          font-family: Arial, sans-serif;
+          background-color: #002160;
+          margin: 5%;
+          padding: 0;
+        }
+        .encabezado {
+          position: fixed;
+          top: 0;
+          width: 90%;
+          background-color: #002160;
+          padding: 40px 0;
+          text-align: center;
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        .encabezado img {
+          width: 250px;
+          height: auto;
+        }
+        .container {
+          margin-top: 200px;
+          width: 90%;
+          background: #002160;
+          padding: 40px;
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 50px;
+        }
+        .profile-section {
+          width: 40%;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+        .profile-section img {
+          width: 350px;
+          height: 350px;
+          border-radius: 50%;
+          object-fit: cover;
+          margin-bottom: 20px;
+        }
+        .form-section {
+          width: 60%;
+        }
+        .header {
+          text-align: center;
+          margin-bottom: 30px;
+        }
+        .header img {
+          width: 450px;
+          height: auto;
+        }
+        .tabs {
+          display: flex;
+          justify-content: center;
+          margin-bottom: 20px;
+        }
+        .tabs label {
+          margin: 0 10px;
+        }
+        .form-group {
+          margin-bottom: 15px;
+        }
+        .form-group label {
+          display: block;
+          margin-bottom: 5px;
+        }
+        .form-group input {
+          width: 100%;
+          padding: 10px;
+          box-sizing: border-box;
+        }
+        .buttons {
+          margin-top: 50px;
+          display: flex;
+          justify-content: space-between;
+        }
+        .buttons button, .buttons a {
+          padding: 12px 30px;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+          font-size: 16px;
+          font-weight: bold;
+          transition: background-color 0.3s, box-shadow 0.3s;
+          text-decoration: none;
+          color: white;
+        }
+        .buttons .save {
+          background-color: #28a745;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .buttons .save:hover {
+          background-color: #218838;
+          box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+        }
+        .buttons .delete {
+          background-color: #dc3545;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .buttons .delete:hover {
+          background-color: #c82333;
+          box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+        }
+        .buttons .home {
+          background-color: #6c757d;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .buttons .home:hover {
+          background-color: #5a6268;
+          box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+</head>
+<body>
+
+<div class="encabezado">
+    <img th:src="@{/Recursos/logo.png}" alt="logo2" class="logo2">
+</div>
+
+<div class="container">
+    <div class="profile-section">
+        <img th:src="@{${usuario.fotoUrl} != null ? 'data:image/png;base64,' + ${usuario.fotoUrl} : '/path/to/default/image.png'}" alt="Imagen de Perfil" class="profile-image" id="profileImage">
+        <label for="profile-image">Cambiar Imagen</label>
+        <input type="file" id="profile-image" name="foto" accept="image/*" onchange="previewImage(event)">
+    </div>
+
+    <div class="form-section">
+        <div class="tabs">
+            <label>
+                <input type="radio" name="role" value="admin" th:checked="${usuario.tipo == 'admin'}"> ADMINISTRADOR
+            </label>
+            <label>
+                <input type="radio" name="role" value="client" th:checked="${usuario.tipo == 'client'}"> CLIENTE
+            </label>
+        </div>
+
+        <form action="/cutienda/perfil/actualizar" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="nombre">Nombre</label>
+                <input type="text" id="nombre" name="nombre" th:value="${usuario.nombre}" required>
+            </div>
+            <div class="form-group">
+                <label for="apellidos">Apellidos</label>
+                <input type="text" id="apellidos" name="apellidos" th:value="${usuario.apellidos}" required>
+            </div>
+            <div class="form-group">
+                <label for="correoElectronico">Correo electrónico</label>
+                <input type="email" id="correoElectronico" name="correoElectronico" th:value="${usuario.correoElectronico}" required>
+            </div>
+            <div class="form-group">
+                <label for="telefono">Teléfono</label>
+                <input type="tel" id="telefono" name="telefono" th:value="${usuario.telefono}" required>
+            </div>
+            <div class="form-group">
+                <label for="contrasena">Contraseña</label>
+                <input type="password" id="contrasena" name="contrasena" th:value="${usuario.contraseña}" required>
+            </div>
+            <div class="form-group">
+                <label for="confirmacionContraseña">Corroborar contraseña</label>
+                <input type="password" id="confirmacionContraseña" name="confirmacionContraseña" th:value="${usuario.confirmacionContraseña}" required>
+            </div>
+            <label>
+                <input type="radio" name="show-password" onclick="togglePassword()"> SHOW
+            </label>
+            <div class="buttons">
+                <button type="submit" class="save">Guardar Cambios</button>
+                <a href="/cutienda/login" class="home">Inicio</a>
+                <button type="button" onclick="confirmDelete(event)" class="delete">Eliminar Cuenta</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function confirmDelete(event) {
+      event.preventDefault();
+      if (confirm("¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer.")) {
+          var xhr = new XMLHttpRequest();
+          xhr.open("POST", "/cutienda/perfil/eliminar", true);
+          xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+          xhr.setRequestHeader('X-CSRF-Token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+
+          xhr.onreadystatechange = function () {
+              if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                  alert("Cuenta eliminada con éxito.");
+                  window.location.href = "/cutienda/login";
+              }
+          };
+          xhr.send();
+      }
+    }
+
+    function togglePassword() {
+      var passwordInput = document.getElementById('contrasena');
+      var checkPasswordInput = document.getElementById('confirmacionContraseña');
+      if (passwordInput.type === "password") {
+        passwordInput.type = "text";
+        checkPasswordInput.type = "text";
+      } else {
+        passwordInput.type = "password";
+        checkPasswordInput.type = "password";
+      }
+    }
+
+    function previewImage(event) {
+        var reader = new FileReader();
+        reader.onload = function() {
+            var output = document.getElementById('profileImage');
+            output.src = reader.result;
+        }
+        reader.readAsDataURL(event.target.files[0]);
+    }
+     document.addEventListener("DOMContentLoaded", function() {
+        const successMessage = /*[[${mensaje}]]*/ '';  // Asegúrate de que esto tenga un valor en la vista
+        const errorMessage = /*[[${error}]]*/ '';  // Asegúrate de que esto tenga un valor en la vista
+
+        if (successMessage) {
+            Swal.fire({
+                position: 'top-end',
+                icon: 'success',
+                title: '¡Guardado con éxito!',
+                text: successMessage,
+                timer: 3000,
+                showConfirmButton: false
+            });
+        }
+
+        if (errorMessage) {
+            Swal.fire({
+                position: 'top-end',
+                icon: 'error',
+                title: 'Error de actualización',
+                text: errorMessage,
+                timer: 3000,
+                showConfirmButton: false
+            });
+        }
+    });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+</body>
+</html>
